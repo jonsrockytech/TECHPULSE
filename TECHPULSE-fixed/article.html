@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading... | TechPulse</title>
+  <meta name="description" content="Read this article on TechPulse.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+  <div class="ticker" aria-label="Tech news ticker">
+    <span class="ticker-label">Live</span>
+    <div class="ticker-track" aria-hidden="true">
+      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
+      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
+      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
+      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
+      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
+      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="container">
+      <div class="logo">
+        <a href="index.html" aria-label="TechPulse Home">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>TechPulse</span>
+        </a>
+      </div>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="admin.html" class="admin-btn">Admin</a>
+        <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span aria-hidden="true">›</span>
+      <a href="index.html">Articles</a>
+      <span aria-hidden="true">›</span>
+      <span id="breadcrumbTitle" class="current">Article</span>
+    </nav>
+
+    <div id="articleContainer" class="article-container">
+      <p class="loading-state">Loading article...</p>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <p>&copy; 2026 TechPulse. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <button id="scrollTopBtn" type="button" aria-label="Scroll to top">↑</button>
+
+  <script src="js/article.js"></script>
+</body>
+</html>
