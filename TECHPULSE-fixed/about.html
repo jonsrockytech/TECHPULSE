@@ -1,85 +1,90 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About | TechPulse</title>
-  <meta name="description" content="About TechPulse — an independent publication simplifying embedded systems and software engineering.">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="About | TechPulse">
-  <meta property="og:description" content="About TechPulse — an independent publication simplifying embedded systems and software engineering.">
-  <meta property="og:image" content="https://techpulse.example.com/assets/og-default.png">
+  <title>About Us — TechPulse</title>
+  <meta name="description" content="Learn more about TechPulse, our core mission, technical engineering scope, and founding expertise in embedded systems and software architecture.">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PXJ7MC96Z0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-PXJ7MC96Z0');
+  </script>
 </head>
 <body>
-  <div class="ticker" aria-label="Tech news ticker">
-    <span class="ticker-label">Live</span>
-    <div class="ticker-track" aria-hidden="true">
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-    </div>
-  </div>
-  <header class="main-header">
+
+  <!-- Main Navigation -->
+  <header class="navbar">
     <div class="container">
-      <div class="logo">
-        <a href="index.html" aria-label="TechPulse Home">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          <span>TechPulse</span>
-        </a>
-      </div>
-      <nav class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html" class="active">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="privacy-policy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="admin.html" class="admin-btn">Admin</a>
-        <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
+      <a href="index.html" class="brand-logo">TechPulse</a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html" class="active">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="privacy-policy.html">Privacy</a></li>
+          <li><a href="terms.html">Terms</a></li>
+        </ul>
       </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="page-content">
-      <h1>About Us</h1>
-      <p>Welcome to <strong>TechPulse</strong> — an independent digital publication dedicated to simplifying complex technological concepts, software development, and engineering standards.</p>
+  <!-- About Section Content -->
+  <main class="container about-container" style="max-width: 850px; padding: 3rem 1rem; line-height: 1.7;">
+    
+    <header class="about-header" style="margin-bottom: 2.5rem; border-bottom: 2px solid #eaeaea; padding-bottom: 1.5rem;">
+      <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: #1a1a1a;">About TechPulse</h1>
+      <p class="lead" style="font-size: 1.15rem; color: #555;">
+        <strong>TechPulse</strong> is an independent engineering publication and knowledge base committed to demystifying complex technical paradigms, embedded architecture, and modern software development.
+      </p>
+    </header>
 
-      <h2>Our Mission</h2>
-      <p>Provide developers, engineers, and tech enthusiasts with well-researched, practical content — without fluff or sensationalism.</p>
+    <section style="margin-bottom: 2.5rem;">
+      <h2 style="font-size: 1.5rem; color: #0056b3; margin-bottom: 0.8rem;">Our Core Mission</h2>
+      <p>
+        To empower developers, field engineers, and hardware enthusiasts with rigorously researched, battle-tested tutorials and technical insights — delivering pure actionable engineering value without marketing fluff or sensationalism.
+      </p>
+    </section>
 
-      <h2>What We Cover</h2>
-      <ul>
-        <li>Embedded microcontrollers and IoT development.</li>
-        <li>System automation, scripting, and software architecture.</li>
-        <li>Hardware reviews and technical troubleshooting guides.</li>
-        <li>Modern web technologies and tooling.</li>
-      </ul>
-
-      <h2>Our Values</h2>
-      <ul>
-        <li><strong>Accuracy first.</strong> Verify before publishing.</li>
-        <li><strong>No fluff.</strong> Respect the reader's time.</li>
-        <li><strong>Open discussion.</strong> Corrections welcome.</li>
+    <section style="margin-bottom: 2.5rem;">
+      <h2 style="font-size: 1.5rem; color: #0056b3; margin-bottom: 0.8rem;">Technical Domain & Coverage</h2>
+      <ul style="padding-left: 1.2rem;">
+        <li style="margin-bottom: 0.5rem;"><strong>Embedded Systems & IoT:</strong> Microcontroller firmware architecture (ESP8266/ESP32, C++, MicroPython), telemetry integration, and low-level protocol interfacing.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Automation & Scripting:</strong> Industrial process automation, custom Python tooling, and local AI model deployment.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Hardware Engineering & Diagnostics:</strong> Component-level troubleshooting, PCB mainboard repair, and power conversion systems.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Modern Web Architecture:</strong> High-performance static site generation, serverless deployment, and lightweight backend API management.</li>
       </ul>
     </section>
+
+    <section style="margin-bottom: 2.5rem;">
+      <h2 style="font-size: 1.5rem; color: #0056b3; margin-bottom: 0.8rem;">Engineering Philosophy</h2>
+      <ul style="padding-left: 1.2rem;">
+        <li style="margin-bottom: 0.5rem;"><strong>Empirical Precision:</strong> Every solution published is verified through direct practical execution before release.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Concise Clarity:</strong> Respecting the reader’s time through direct, well-structured technical documentation.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Technical Rigor:</strong> Prioritizing root-cause analysis over superficial, temporary fixes.</li>
+      </ul>
+    </section>
+
+    <section class="founder-card" style="background: #f4f6f9; border-left: 4px solid #0056b3; padding: 1.8rem; border-radius: 6px; margin-top: 3rem;">
+      <h2 style="font-size: 1.4rem; color: #1a1a1a; margin-top: 0; margin-bottom: 0.8rem;">About the Author & Technical Lead</h2>
+      <p style="margin-bottom: 0;">
+        With years of practical engineering expertise across <strong>Embedded Microcontrollers</strong>, <strong>C++/MicroPython Firmware Development</strong>, and <strong>Hardware Diagnostics</strong>, I specialize in bridging the gap between hardware telemetry and software architecture. From designing custom wireless controllers and local AI automation scripts to analyzing complex electro-mechanical industrial systems, my mission through TechPulse is to share verified, high-precision technical documentation for engineering professionals.
+      </p>
+    </section>
+
   </main>
 
-  <footer class="main-footer">
-    <div class="container">
-      <p>&copy; 2026 TechPulse. All rights reserved.</p>
-      <div class="footer-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-      </div>
-    </div>
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 2rem 0; border-top: 1px solid #eaeaea; margin-top: 3rem; color: #777; font-size: 0.9rem;">
+    <p>&copy; 2026 TechPulse. All rights reserved.</p>
   </footer>
-  <script src="js/main.js"></script>
+
 </body>
 </html>
