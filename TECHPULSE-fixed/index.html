@@ -1,126 +1,146 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TechPulse | Technical Tutorials &amp; Embedded Systems</title>
-  <meta name="description" content="TechPulse - Your primary hub for hardware tutorials, microcontrollers, and embedded systems.">
-  <meta name="keywords" content="embedded systems, microcontrollers, ESP32, IoT, tutorials, hardware">
-  <link rel="canonical" href="https://techpulse.example.com/">
-
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="TechPulse | Technical Tutorials & Embedded Systems">
-  <meta property="og:description" content="Your primary hub for hardware tutorials, microcontrollers, and embedded systems.">
-  <meta property="og:url" content="https://techpulse.example.com/">
-  <meta property="og:image" content="https://techpulse.example.com/assets/og-default.png">
-  <meta name="twitter:card" content="summary_large_image">
-
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="alternate" type="application/rss+xml" title="TechPulse RSS" href="rss.xml">
-  <link rel="stylesheet" href="css/style.css">
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PXJ7MC96Z0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-PXJ7MC96Z0');
-</script>
+  <title>TechPulse - Advanced Embedded Systems & Technical Guides</title>
+  <link href="https://techpulse12.vercel.app/" rel="canonical">
+  <link href="favicon.ico" rel="icon" type="image/x-icon">
+  <link href="rss.xml" rel="alternate" title="TechPulse RSS" type="application/rss+xml">
+  <link rel="stylesheet" href="style.css"> <!-- تأكد من ربط ملف الـ CSS الخاص بك -->
+  <style>
+    /* تنسيق كارت تسجيل الدخول السريع للأدمن */
+    .admin-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+    }
+    .admin-modal-overlay.active { display: flex; }
+    .admin-modal-card {
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+    .admin-modal-card h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.25rem; }
+    .admin-modal-card input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .admin-modal-card button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #2563eb;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .admin-modal-card button:hover { background: #1d4ed8; }
+    .admin-badge {
+      background: #ef4444;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="ticker" aria-label="Tech news ticker">
-    <span class="ticker-label">Live</span>
-    <div class="ticker-track" aria-hidden="true">
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">Linux 6.12 brings real-time preemption</a></span>
-      <span class="ticker-item"><a href="#">ESP32-C6 adds Wi-Fi 6 support</a></span>
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">Linux 6.12 brings real-time preemption</a></span>
-      <span class="ticker-item"><a href="#">ESP32-C6 adds Wi-Fi 6 support</a></span>
+  <!-- Live Ticker -->
+  <div aria-label="Tech news ticker">
+    <span>Live</span>
+    <div aria-hidden="true">
+      <span><a href="#">New RISC-V chips target edge AI workloads</a></span>
+      <span><a href="#">WebGPU lands in all major browsers</a></span>
+      <span><a href="#">Rust 2.0 roadmap officially published</a></span>
+      <span><a href="#">Linux 6.12 brings real-time preemption</a></span>
+      <span><a href="#">ESP32-C6 adds Wi-Fi 6 support</a></span>
     </div>
   </div>
 
-  <header class="main-header">
-    <div class="container">
-      <div class="logo">
-        <a href="index.html" aria-label="TechPulse Home">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
+  <!-- Header -->
+  <header>
+    <div>
+      <div>
+        <a aria-label="TechPulse Home" href="index.html">
           <span>TechPulse</span>
         </a>
       </div>
-      <nav class="nav-links" aria-label="Main navigation">
-        <a href="index.html" class="active">Home</a>
+      <nav aria-label="Main navigation" id="main-nav">
+        <a href="index.html">Home</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
         <a href="privacy-policy.html">Privacy</a>
         <a href="terms.html">Terms</a>
-        <a href="admin.html" class="admin-btn">Admin</a>
-        <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
+        <!-- تم إخفاء رابط الأدمن افتراضيًا ولن يظهر إلا عند المصادقة -->
+        <a href="admin.html" id="admin-nav-link" style="display: none;" class="admin-badge">Admin Panel</a>
       </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="hero-section">
+  <!-- Main Content -->
+  <main>
+    <section>
       <h1>Advanced Embedded Systems &amp; Technical Guides</h1>
       <p>Explore exclusive hardware tutorials and practical engineering projects.</p>
     </section>
 
-    <div class="toolbar">
-      <div class="search-box">
-        <input type="search" id="searchInput" placeholder="Search articles..." aria-label="Search articles">
-      </div>
-    </div>
+    <div aria-label="Filter by category"></div>
 
-    <div class="filters" id="filters" aria-label="Filter by category"></div>
-
-    <div class="layout">
+    <div>
       <div>
-        <section class="articles-grid" id="articles-container" aria-live="polite">
-          <p class="loading-state">Loading articles...</p>
+        <section aria-live="polite">
+          <p>Loading articles...</p>
         </section>
       </div>
 
-      <aside class="sidebar" aria-label="Sidebar">
-        <div class="widget">
+      <aside aria-label="Sidebar">
+        <div>
           <h3>🔥 Trending</h3>
-          <ol class="popular-list" id="trendingList">
-            <li style="color:var(--text-muted);font-size:0.9rem">Loading...</li>
+          <ol>
+            <li>Loading...</li>
           </ol>
         </div>
 
-        <div class="widget">
+        <div>
           <h3>📬 Newsletter</h3>
-          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:12px;">
-            Weekly digest of the best tech articles. No spam.
-          </p>
-          <form class="newsletter-form" novalidate>
-            <input type="email" placeholder="you@example.com" aria-label="Email address" required>
-            <button type="submit">Subscribe</button>
-            <p class="newsletter-msg" aria-live="polite"></p>
-          </form>
+          <p>Weekly digest of the best tech articles. No spam.</p>
         </div>
 
-        <div class="widget">
+        <div>
           <h3>🏷 Topics</h3>
-          <div class="tags" id="tagList"></div>
+          <div></div>
         </div>
       </aside>
     </div>
   </main>
 
-  <footer class="main-footer">
-    <div class="container">
-      <p>&copy; 2026 TechPulse. All rights reserved.</p>
-      <div class="footer-links">
+  <!-- Footer -->
+  <footer>
+    <div>
+      <p>© 2026 TechPulse. All rights reserved.</p>
+      <div>
         <a href="privacy-policy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
         <a href="rss.xml">RSS</a>
@@ -129,8 +149,59 @@
     </div>
   </footer>
 
-  <button id="scrollTopBtn" type="button" aria-label="Scroll to top">↑</button>
+  <!-- Modal المخفي لإدخال كلمة السر -->
+  <div class="admin-modal-overlay" id="admin-modal">
+    <div class="admin-modal-card">
+      <h3>Admin Access</h3>
+      <input type="password" id="admin-pass-input" placeholder="Enter Security PIN..." autocomplete="off">
+      <button onclick="verifyAdminAccess()">Login</button>
+    </div>
+  </div>
 
-  <script src="js/main.js"></script>
+  <!-- Script التحكم المحترف -->
+  <script>
+    // 🔑 يمكنك تغيير رمز الدخول السري من هنا
+    const SECRET_PIN = "123456"; 
+
+    const adminModal = document.getElementById('admin-modal');
+    const adminPassInput = document.getElementById('admin-pass-input');
+    const adminNavLink = document.getElementById('admin-nav-link');
+
+    // 1. التحقق التلقائي عند فتح الصفحة إذا كنت قد سجلت دخولك سابقًا
+    document.addEventListener("DOMContentLoaded", () => {
+      if (sessionStorage.getItem("tp_admin_authenticated") === "true") {
+        adminNavLink.style.display = "inline-block";
+      }
+    });
+
+    // 2. اختصار الكيبورد السرّي: Ctrl + Shift + A
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        adminModal.classList.add('active');
+        adminPassInput.focus();
+      }
+      // إغلاق المودال بزر Esc
+      if (e.key === "Escape") {
+        adminModal.classList.remove('active');
+      }
+    });
+
+    // 3. دالة التأكد من كلمة السر
+    function verifyAdminAccess() {
+      const enteredPin = adminPassInput.value.trim();
+      if (enteredPin === SECRET_PIN) {
+        sessionStorage.setItem("tp_admin_authenticated", "true");
+        adminNavLink.style.display = "inline-block";
+        adminModal.classList.remove('active');
+        adminPassInput.value = "";
+        // التوجيه المباشر إلى لوحة الأدمن
+        window.location.href = "admin.html";
+      } else {
+        alert("Incorrect Security PIN!");
+        adminPassInput.value = "";
+      }
+    }
+  </script>
 </body>
 </html>
