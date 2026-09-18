@@ -18,8 +18,33 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="alternate" type="application/rss+xml" title="TechPulse RSS" href="rss.xml">
   <link rel="stylesheet" href="css/style.css">
+  
   <style>
-    /* Admin secret modal styling */
+    /* Global Progress Bar & Enhancements */
+    #readingProgressBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: #2563eb;
+      width: 0%;
+      z-index: 10000;
+      transition: width 0.1s ease-out;
+    }
+    
+    /* Language Selector Styling */
+    .lang-select {
+      background: var(--bg-secondary, #1e293b);
+      color: var(--text-color, #f8fafc);
+      border: 1px solid #334155;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* Secret Admin Modal */
     .admin-modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -66,23 +91,35 @@
       cursor: pointer;
     }
     .admin-modal-card button:hover { background: #1d4ed8; }
+
+    /* Copy Code Button */
+    pre { position: relative; }
+    .copy-code-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #334155;
+      color: #ffffff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .copy-code-btn:hover { background: #475569; }
   </style>
 </head>
 <body>
 
+  <!-- Top Scroll Progress Bar -->
+  <div id="readingProgressBar"></div>
+
+  <!-- News Ticker -->
   <div class="ticker" aria-label="Tech news ticker">
-    <span class="ticker-label">Live</span>
-    <div class="ticker-track" aria-hidden="true">
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">Linux 6.12 brings real-time preemption</a></span>
-      <span class="ticker-item"><a href="#">ESP32-C6 adds Wi-Fi 6 support</a></span>
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">Linux 6.12 brings real-time preemption</a></span>
-      <span class="ticker-item"><a href="#">ESP32-C6 adds Wi-Fi 6 support</a></span>
+    <span class="ticker-label" id="tickerLabel">Live</span>
+    <div class="ticker-track" id="tickerTrack" aria-hidden="true">
+      <!-- Dynamic Ticker Items loaded via JS -->
     </div>
   </div>
 
@@ -97,12 +134,22 @@
         </a>
       </div>
       <nav class="nav-links" aria-label="Main navigation">
-        <a href="index.html" class="active">Home</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="privacy-policy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <!-- Hidden by default -->
+        <a href="index.html" class="active" data-i18n="nav_home">Home</a>
+        <a href="about.html" data-i18n="nav_about">About</a>
+        <a href="contact.html" data-i18n="nav_contact">Contact</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms</a>
+        
+        <!-- Language Switcher (Top Global Languages by Population - No Arabic) -->
+        <select id="languageSelector" class="lang-select" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="zh">中文 (Chinese)</option>
+          <option value="es">Español</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="fr">Français</option>
+        </select>
+
+        <!-- Hidden Admin Link -->
         <a href="admin.html" id="adminBtn" class="admin-btn" style="display: none;">Admin</a>
         <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
       </nav>
@@ -111,13 +158,13 @@
 
   <main class="container">
     <section class="hero-section">
-      <h1>Advanced Embedded Systems &amp; Technical Guides</h1>
-      <p>Explore exclusive hardware tutorials and practical engineering projects.</p>
+      <h1 data-i18n="hero_title">Advanced Embedded Systems &amp; Technical Guides</h1>
+      <p data-i18n="hero_desc">Explore exclusive hardware tutorials and practical engineering projects.</p>
     </section>
 
     <div class="toolbar">
       <div class="search-box">
-        <input type="search" id="searchInput" placeholder="Search articles..." aria-label="Search articles">
+        <input type="search" id="searchInput" placeholder="Search articles..." aria-label="Search articles" data-i18n-ph="search_ph">
       </div>
     </div>
 
@@ -126,32 +173,32 @@
     <div class="layout">
       <div>
         <section class="articles-grid" id="articles-container" aria-live="polite">
-          <p class="loading-state">Loading articles...</p>
+          <p class="loading-state" data-i18n="loading">Loading articles...</p>
         </section>
       </div>
 
       <aside class="sidebar" aria-label="Sidebar">
         <div class="widget">
-          <h3>🔥 Trending</h3>
+          <h3 data-i18n="widget_trending">🔥 Trending</h3>
           <ol class="popular-list" id="trendingList">
-            <li style="color:var(--text-muted);font-size:0.9rem">Loading...</li>
+            <li style="color:var(--text-muted);font-size:0.9rem" data-i18n="loading">Loading...</li>
           </ol>
         </div>
 
         <div class="widget">
-          <h3>📬 Newsletter</h3>
-          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:12px;">
+          <h3 data-i18n="widget_newsletter">📬 Newsletter</h3>
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:12px;" data-i18n="newsletter_desc">
             Weekly digest of the best tech articles. No spam.
           </p>
           <form class="newsletter-form" novalidate>
             <input type="email" placeholder="you@example.com" aria-label="Email address" required>
-            <button type="submit">Subscribe</button>
+            <button type="submit" data-i18n="btn_subscribe">Subscribe</button>
             <p class="newsletter-msg" aria-live="polite"></p>
           </form>
         </div>
 
         <div class="widget">
-          <h3>🏷 Topics</h3>
+          <h3 data-i18n="widget_topics">🏷 Topics</h3>
           <div class="tags" id="tagList"></div>
         </div>
       </aside>
@@ -162,8 +209,8 @@
     <div class="container">
       <p>&copy; 2026 TechPulse. All rights reserved.</p>
       <div class="footer-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy Policy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms of Service</a>
         <a href="rss.xml">RSS</a>
         <a href="sitemap.xml">Sitemap</a>
       </div>
@@ -183,9 +230,9 @@
 
   <script src="js/main.js"></script>
 
-  <!-- Admin Toggle Script -->
+  <!-- Admin Secret Script -->
   <script>
-    const SECRET_PIN = "123456"; // Change your PIN here
+    const SECRET_PIN = "123456";
     const adminBtn = document.getElementById('adminBtn');
     const adminModal = document.getElementById('adminModal');
     const adminPassInput = document.getElementById('adminPassInput');
