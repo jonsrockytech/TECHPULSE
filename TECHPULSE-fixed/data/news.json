@@ -1,1 +1,27 @@
-
+[
+  {
+    "id": 1,
+    "title": "New RISC-V chips target edge AI workloads",
+    "url": "#"
+  },
+  {
+    "id": 2,
+    "title": "WebGPU lands in all major browsers",
+    "url": "#"
+  },
+  {
+    "id": 3,
+    "title": "Rust 2.0 roadmap officially published",
+    "url": "#"
+  },
+  {
+    "id": 4,
+    "title": "Linux 6.12 brings real-time preemption",
+    "url": "#"
+  },
+  {
+    "id": 5,
+    "title": "ESP32-C6 adds Wi-Fi 6 & 802.15.4 support",
+    "url": "#"
+  }
+]
