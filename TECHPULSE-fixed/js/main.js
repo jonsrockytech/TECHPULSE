@@ -1,637 +1,238 @@
-/* =========================================================
-   TECHPULSE - MAIN.JS
-   ========================================================= */
+/* ==========================================================================
+   TechPulse Global Engine
+   ========================================================================== */
 
-(() => {
-    "use strict";
+// 1. Translations Dictionary (English, Chinese, Spanish, Hindi, French)
+const translations = {
+  en: {
+    nav_home: "Home",
+    nav_about: "About",
+    nav_contact: "Contact",
+    nav_privacy: "Privacy",
+    nav_terms: "Terms",
+    hero_title: "Advanced Embedded Systems & Technical Guides",
+    hero_desc: "Explore exclusive hardware tutorials and practical engineering projects.",
+    search_ph: "Search articles...",
+    loading: "Loading articles...",
+    widget_trending: "🔥 Trending",
+    widget_newsletter: "📬 Newsletter",
+    newsletter_desc: "Weekly digest of the best tech articles. No spam.",
+    btn_subscribe: "Subscribe",
+    widget_topics: "🏷 Topics",
+    read_time: "min read",
+    views: "views"
+  },
+  zh: {
+    nav_home: "首页",
+    nav_about: "关于",
+    nav_contact: "联系",
+    nav_privacy: "隐私",
+    nav_terms: "条款",
+    hero_title: "高级嵌入式系统与技术指南",
+    hero_desc: "探索独家硬件教程和实用工程项目。",
+    search_ph: "搜索文章...",
+    loading: "正在加载文章...",
+    widget_trending: "🔥 热门文章",
+    widget_newsletter: "📬 简报",
+    newsletter_desc: "每周精选最佳技术文章，无垃圾邮件。",
+    btn_subscribe: "订阅",
+    widget_topics: "🏷 主题",
+    read_time: "分钟阅读",
+    views: "次阅读"
+  },
+  es: {
+    nav_home: "Inicio",
+    nav_about: "Acerca de",
+    nav_contact: "Contacto",
+    nav_privacy: "Privacidad",
+    nav_terms: "Términos",
+    hero_title: "Sistemas Embebidos Avanzados y Guías Técnicas",
+    hero_desc: "Explore tutoriales de hardware exclusivos y proyectos prácticos de ingeniería.",
+    search_ph: "Buscar artículos...",
+    loading: "Cargando artículos...",
+    widget_trending: "🔥 Tendencias",
+    widget_newsletter: "📬 Boletín",
+    newsletter_desc: "Resumen semanal de los mejores artículos técnicos. Sin spam.",
+    btn_subscribe: "Suscribirse",
+    widget_topics: "🏷 Temas",
+    read_time: "min de lectura",
+    views: "vistas"
+  },
+  hi: {
+    nav_home: "होम",
+    nav_about: "हमारे बारे में",
+    nav_contact: "संपर्क करें",
+    nav_privacy: "गोपनीयता",
+    nav_terms: "शर्तें",
+    hero_title: "उन्नत एम्बेडेड सिस्टम और तकनीकी गाइड",
+    hero_desc: "विशेष हार्डवेयर ट्यूटोरियल और व्यावहारिक इंजीनियरिंग परियोजनाओं का अन्वेषण करें।",
+    search_ph: "लेख खोजें...",
+    loading: "लेख लोड हो रहे हैं...",
+    widget_trending: "🔥 ट्रेंडिंग",
+    widget_newsletter: "📬 न्यूज़लेटर",
+    newsletter_desc: "सर्वश्रेष्ठ तकनीकी लेखों का साप्ताहिक डाइजेस्ट। नो स्पैम।",
+    btn_subscribe: "सदस्यता लें",
+    widget_topics: "🏷 विषय",
+    read_time: "मिनट पढ़ने का समय",
+    views: "बार देखा गया"
+  },
+  fr: {
+    nav_home: "Accueil",
+    nav_about: "À propos",
+    nav_contact: "Contact",
+    nav_privacy: "Confidentialité",
+    nav_terms: "Conditions",
+    hero_title: "Systèmes Embarqués Avancés et Guides Techniques",
+    hero_desc: "Explorez des tutoriels matériels exclusifs et des projets d'ingénierie pratiques.",
+    search_ph: "Rechercher des articles...",
+    loading: "Chargement des articles...",
+    widget_trending: "🔥 Tendances",
+    widget_newsletter: "📬 Infolettre",
+    newsletter_desc: "Condensé hebdomadaire des meilleurs articles techniques. Sans spam.",
+    btn_subscribe: "S'abonner",
+    widget_topics: "🏷 Sujets",
+    read_time: "min de lecture",
+    views: "vues"
+  }
+};
 
-    /* ---------------------------------------------------------
-       GLOBAL DATA
-       --------------------------------------------------------- */
+// Default Language Initialization
+let currentLang = localStorage.getItem("tp_language") || "en";
 
-    let articles = [];
-    let filteredArticles = [];
+document.addEventListener("DOMContentLoaded", () => {
+  initLanguageSwitcher();
+  initNewsTicker();
+  initScrollProgress();
+  enableCodeCopying();
+  initViewsAndReadTime();
+  initDarkModeToggle();
+});
 
-    /* ---------------------------------------------------------
-       DOM READY
-       --------------------------------------------------------- */
+// 2. Language Switcher Logic
+function initLanguageSwitcher() {
+  const selector = document.getElementById("languageSelector");
+  if (selector) {
+    selector.value = currentLang;
+    applyLanguage(currentLang);
 
-    document.addEventListener("DOMContentLoaded", async () => {
-        initTheme();
-        initMobileMenu();
-        initSearch();
-        initNewsletter();
-        initContactForm();
-
-        await loadArticles();
-        renderPage();
+    selector.addEventListener("change", (e) => {
+      currentLang = e.target.value;
+      localStorage.setItem("tp_language", currentLang);
+      applyLanguage(currentLang);
     });
-
-    /* ---------------------------------------------------------
-       LOAD ARTICLES
-       --------------------------------------------------------- */
-
-    async function loadArticles() {
-        const loadingElements = document.querySelectorAll(
-            ".loading, [data-loading]"
-        );
-
-        loadingElements.forEach((el) => {
-            el.textContent = "Loading...";
-        });
-
-        try {
-            const response = await fetch("./data/articles.json", {
-                cache: "no-store"
-            });
-
-            if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`
-                );
-            }
-
-            const data = await response.json();
-
-            if (!Array.isArray(data)) {
-                throw new Error("articles.json must contain an array");
-            }
-
-            articles = data;
-
-            console.log(
-                `TechPulse: ${articles.length} article(s) loaded successfully.`
-            );
-
-        } catch (error) {
-            console.error("TechPulse: unable to load articles:", error);
-
-            articles = [];
-
-            showLoadingError();
-        }
-
-        /* -----------------------------------------------------
-           LOCAL STORAGE ARTICLES
-           ----------------------------------------------------- */
-
-        try {
-            const localArticles = JSON.parse(
-                localStorage.getItem("tp_articles")
-            );
-
-            if (
-                Array.isArray(localArticles) &&
-                localArticles.length > 0
-            ) {
-                articles = localArticles;
-                console.log(
-                    `TechPulse: ${articles.length} local article(s) loaded.`
-                );
-            }
-        } catch (error) {
-            console.warn(
-                "TechPulse: invalid localStorage articles.",
-                error
-            );
-        }
-
-        filteredArticles = [...articles];
-    }
-
-    /* ---------------------------------------------------------
-       RENDER PAGE
-       --------------------------------------------------------- */
-
-    function renderPage() {
-        renderTrending();
-        renderArticles();
-        renderLatest();
-        renderCategories();
-    }
-
-    /* ---------------------------------------------------------
-       TRENDING
-       --------------------------------------------------------- */
-
-    function renderTrending() {
-        const containers = document.querySelectorAll(
-            "#trending, .trending-grid, [data-trending]"
-        );
-
-        if (!containers.length) {
-            return;
-        }
-
-        containers.forEach((container) => {
-            container.innerHTML = "";
-
-            if (!articles.length) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>No articles available.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const trending = [...articles]
-                .sort((a, b) => {
-                    const viewsA = Number(a.views || a.reads || 0);
-                    const viewsB = Number(b.views || b.reads || 0);
-
-                    return viewsB - viewsA;
-                })
-                .slice(0, 6);
-
-            trending.forEach((article) => {
-                container.appendChild(createArticleCard(article));
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       ARTICLES
-       --------------------------------------------------------- */
-
-    function renderArticles(list = filteredArticles) {
-        const containers = document.querySelectorAll(
-            "#articles, .articles-grid, [data-articles]"
-        );
-
-        containers.forEach((container) => {
-            container.innerHTML = "";
-
-            if (!list.length) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No articles found</h3>
-                        <p>Try another search or category.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            list.forEach((article) => {
-                container.appendChild(createArticleCard(article));
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       LATEST ARTICLES
-       --------------------------------------------------------- */
-
-    function renderLatest() {
-        const containers = document.querySelectorAll(
-            "#latest, .latest-grid, [data-latest]"
-        );
-
-        containers.forEach((container) => {
-            container.innerHTML = "";
-
-            const latest = [...articles]
-                .sort((a, b) => {
-                    const dateA = new Date(
-                        a.date || a.publishedAt || 0
-                    );
-
-                    const dateB = new Date(
-                        b.date || b.publishedAt || 0
-                    );
-
-                    return dateB - dateA;
-                })
-                .slice(0, 6);
-
-            latest.forEach((article) => {
-                container.appendChild(createArticleCard(article));
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       ARTICLE CARD
-       --------------------------------------------------------- */
-
-    function createArticleCard(article) {
-        const card = document.createElement("article");
-
-        card.className = "article-card";
-
-        const title =
-            article.title ||
-            article.name ||
-            "Untitled article";
-
-        const excerpt =
-            article.excerpt ||
-            article.description ||
-            article.summary ||
-            "";
-
-        const category =
-            article.category ||
-            article.categories ||
-            "Technology";
-
-        const image =
-            article.image ||
-            article.cover ||
-            article.thumbnail ||
-            "assets/og-default.png";
-
-        const date =
-            article.date ||
-            article.publishedAt ||
-            "";
-
-        const slug =
-            article.slug ||
-            article.id ||
-            "";
-
-        const url =
-            article.url ||
-            `article.html${slug ? "?slug=" + encodeURIComponent(slug) : ""}`;
-
-        card.innerHTML = `
-            <a
-                href="${escapeHTML(url)}"
-                class="article-card-link"
-                aria-label="${escapeHTML(title)}"
-            >
-                <div class="article-image-wrapper">
-                    <img
-                        src="${escapeHTML(image)}"
-                        alt="${escapeHTML(title)}"
-                        class="article-image"
-                        loading="lazy"
-                        onerror="this.src='assets/og-default.png'"
-                    >
-                </div>
-
-                <div class="article-card-content">
-
-                    <span class="article-category">
-                        ${escapeHTML(category)}
-                    </span>
-
-                    <h3 class="article-title">
-                        ${escapeHTML(title)}
-                    </h3>
-
-                    ${
-                        excerpt
-                            ? `
-                            <p class="article-excerpt">
-                                ${escapeHTML(excerpt)}
-                            </p>
-                            `
-                            : ""
-                    }
-
-                    ${
-                        date
-                            ? `
-                            <time class="article-date">
-                                ${formatDate(date)}
-                            </time>
-                            `
-                            : ""
-                    }
-
-                </div>
-            </a>
-        `;
-
-        return card;
-    }
-
-    /* ---------------------------------------------------------
-       CATEGORIES
-       --------------------------------------------------------- */
-
-    function renderCategories() {
-        const containers = document.querySelectorAll(
-            "#categories, .categories, [data-categories]"
-        );
-
-        if (!containers.length) {
-            return;
-        }
-
-        const categories = [
-            ...new Set(
-                articles
-                    .map((article) => article.category)
-                    .filter(Boolean)
-            )
-        ];
-
-        containers.forEach((container) => {
-            container.innerHTML = "";
-
-            categories.forEach((category) => {
-                const button = document.createElement("button");
-
-                button.className = "category-button";
-                button.textContent = category;
-
-                button.addEventListener("click", () => {
-                    filterByCategory(category);
-                });
-
-                container.appendChild(button);
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       CATEGORY FILTER
-       --------------------------------------------------------- */
-
-    function filterByCategory(category) {
-        filteredArticles = articles.filter(
-            (article) =>
-                String(article.category || "").toLowerCase() ===
-                String(category).toLowerCase()
-        );
-
-        renderArticles(filteredArticles);
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }
-
-    /* ---------------------------------------------------------
-       SEARCH
-       --------------------------------------------------------- */
-
-    function initSearch() {
-        const searchInputs = document.querySelectorAll(
-            "#search, .search-input, [data-search]"
-        );
-
-        searchInputs.forEach((input) => {
-            input.addEventListener("input", () => {
-                const query = input.value
-                    .trim()
-                    .toLowerCase();
-
-                if (!query) {
-                    filteredArticles = [...articles];
-                    renderArticles();
-                    return;
-                }
-
-                filteredArticles = articles.filter((article) => {
-                    const searchableText = [
-                        article.title,
-                        article.excerpt,
-                        article.description,
-                        article.category,
-                        article.content,
-                        article.author
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .toLowerCase();
-
-                    return searchableText.includes(query);
-                });
-
-                renderArticles(filteredArticles);
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       MOBILE MENU
-       --------------------------------------------------------- */
-
-    function initMobileMenu() {
-        const buttons = document.querySelectorAll(
-            ".menu-toggle, #menu-toggle, [data-menu-toggle]"
-        );
-
-        buttons.forEach((button) => {
-            button.addEventListener("click", () => {
-                document.body.classList.toggle("menu-open");
-
-                const menu = document.querySelector(
-                    ".mobile-menu, .nav-menu, nav"
-                );
-
-                if (menu) {
-                    menu.classList.toggle("open");
-                }
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       DARK MODE
-       --------------------------------------------------------- */
-
-    function initTheme() {
-        const themeButtons = document.querySelectorAll(
-            "#theme-toggle, .theme-toggle, [data-theme-toggle]"
-        );
-
-        const savedTheme = localStorage.getItem("tp_theme");
-
-        if (savedTheme === "dark") {
-            document.documentElement.classList.add("dark");
-            document.body.classList.add("dark");
-        }
-
-        themeButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                const dark =
-                    document.documentElement.classList.toggle("dark");
-
-                document.body.classList.toggle("dark", dark);
-
-                localStorage.setItem(
-                    "tp_theme",
-                    dark ? "dark" : "light"
-                );
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       NEWSLETTER
-       --------------------------------------------------------- */
-
-    function initNewsletter() {
-        const forms = document.querySelectorAll(
-            "#newsletter-form, .newsletter-form, [data-newsletter]"
-        );
-
-        forms.forEach((form) => {
-            form.addEventListener("submit", (event) => {
-                event.preventDefault();
-
-                const emailInput = form.querySelector(
-                    'input[type="email"]'
-                );
-
-                if (!emailInput) {
-                    return;
-                }
-
-                const email = emailInput.value.trim();
-
-                if (!email || !isValidEmail(email)) {
-                    showMessage(
-                        form,
-                        "Please enter a valid email address.",
-                        "error"
-                    );
-                    return;
-                }
-
-                let subscribers = [];
-
-                try {
-                    subscribers = JSON.parse(
-                        localStorage.getItem(
-                            "tp_subscribers"
-                        )
-                    ) || [];
-                } catch {
-                    subscribers = [];
-                }
-
-                if (!subscribers.includes(email)) {
-                    subscribers.push(email);
-
-                    localStorage.setItem(
-                        "tp_subscribers",
-                        JSON.stringify(subscribers)
-                    );
-                }
-
-                emailInput.value = "";
-
-                showMessage(
-                    form,
-                    "Thank you! You are subscribed.",
-                    "success"
-                );
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       CONTACT FORM
-       --------------------------------------------------------- */
-
-    function initContactForm() {
-        const forms = document.querySelectorAll(
-            "#contact-form, .contact-form"
-        );
-
-        forms.forEach((form) => {
-            form.addEventListener("submit", (event) => {
-                event.preventDefault();
-
-                showMessage(
-                    form,
-                    "Your message has been received.",
-                    "success"
-                );
-
-                form.reset();
-            });
-        });
-    }
-
-    /* ---------------------------------------------------------
-       ERROR
-       --------------------------------------------------------- */
-
-    function showLoadingError() {
-        const containers = document.querySelectorAll(
-            "#trending, .trending-grid, [data-trending]"
-        );
-
-        containers.forEach((container) => {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <h3>Unable to load articles</h3>
-                    <p>
-                        Please refresh the page and try again.
-                    </p>
-                </div>
-            `;
-        });
-    }
-
-    /* ---------------------------------------------------------
-       MESSAGE
-       --------------------------------------------------------- */
-
-    function showMessage(form, message, type) {
-        let messageElement =
-            form.querySelector(".form-message");
-
-        if (!messageElement) {
-            messageElement = document.createElement("div");
-            messageElement.className = "form-message";
-
-            form.appendChild(messageElement);
-        }
-
-        messageElement.textContent = message;
-        messageElement.className =
-            `form-message ${type}`;
-    }
-
-    /* ---------------------------------------------------------
-       DATE FORMAT
-       --------------------------------------------------------- */
-
-    function formatDate(date) {
-        const parsedDate = new Date(date);
-
-        if (Number.isNaN(parsedDate.getTime())) {
-            return String(date);
-        }
-
-        return parsedDate.toLocaleDateString(
-            "en-US",
-            {
-                year: "numeric",
-                month: "short",
-                day: "numeric"
-            }
-        );
-    }
-
-    /* ---------------------------------------------------------
-       EMAIL VALIDATION
-       --------------------------------------------------------- */
-
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    /* ---------------------------------------------------------
-       HTML ESCAPE
-       --------------------------------------------------------- */
-
-    function escapeHTML(value) {
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-})();
+  }
+}
+
+function applyLanguage(lang) {
+  const dict = translations[lang] || translations["en"];
+  
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.innerText = dict[key];
+  });
+
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    const key = el.getAttribute("data-i18n-ph");
+    if (dict[key]) el.placeholder = dict[key];
+  });
+}
+
+// 3. Dynamic News Ticker Engine
+function initNewsTicker() {
+  const newsItems = [
+    { text: "New RISC-V chips target edge AI workloads", url: "#" },
+    { text: "WebGPU lands in all major browsers", url: "#" },
+    { text: "Rust 2.0 roadmap officially published", url: "#" },
+    { text: "Linux 6.12 brings real-time preemption", url: "#" },
+    { text: "ESP32-C6 adds Wi-Fi 6 & 802.15.4 support", url: "#" }
+  ];
+
+  const track = document.getElementById("tickerTrack");
+  if (!track) return;
+
+  track.innerHTML = "";
+  // Repeat array twice for smooth CSS infinite scrolling
+  [...newsItems, ...newsItems].forEach(item => {
+    const span = document.createElement("span");
+    span.className = "ticker-item";
+    span.innerHTML = `<a href="${item.url}">${item.text}</a>`;
+    track.appendChild(span);
+  });
+}
+
+// 4. Scroll Reading Progress Bar
+function initScrollProgress() {
+  const bar = document.getElementById("readingProgressBar");
+  if (!bar) return;
+
+  window.addEventListener("scroll", () => {
+    const winScroll = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    bar.style.width = scrolled + "%";
+  });
+}
+
+// 5. Article Views & Reading Time Counter
+function initViewsAndReadTime() {
+  const articles = document.querySelectorAll(".article-card, article");
+  
+  articles.forEach((article, index) => {
+    const artId = article.dataset.id || `art_${index}`;
+    
+    // View Counter Logic
+    let views = localStorage.getItem(`views_${artId}`) || Math.floor(Math.random() * 500) + 120;
+    views = parseInt(views) + 1;
+    localStorage.setItem(`views_${artId}`, views);
+
+    // Reading Time Calculation (Average 200 WPM)
+    const text = article.innerText || "";
+    const words = text.trim().split(/\s+/).length;
+    const readMin = Math.max(1, Math.ceil(words / 200));
+
+    // Append Metadata to Card/Article
+    const metaBox = article.querySelector(".article-meta") || article;
+    const statsSpan = document.createElement("div");
+    statsSpan.className = "article-stats";
+    statsSpan.style.cssText = "font-size:0.8rem; color:var(--text-muted, #94a3b8); margin-top:6px; display:flex; gap:12px;";
+    
+    const langDict = translations[currentLang];
+    statsSpan.innerHTML = `
+      <span>👁️ ${views} ${langDict.views}</span>
+      <span>⏱️ ${readMin} ${langDict.read_time}</span>
+    `;
+    metaBox.appendChild(statsSpan);
+  });
+}
+
+// 6. Copy Code Button Snippet
+function enableCodeCopying() {
+  document.querySelectorAll("pre").forEach(block => {
+    const btn = document.createElement("button");
+    btn.className = "copy-code-btn";
+    btn.innerText = "Copy";
+    
+    block.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+      const code = block.querySelector("code") ? block.querySelector("code").innerText : block.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        btn.innerText = "Copied!";
+        setTimeout(() => btn.innerText = "Copy", 2000);
+      });
+    });
+  });
+}
+
+// 7. Dark Mode Toggle Helper
+function initDarkModeToggle() {
+  const toggleBtn = document.getElementById("darkModeToggle");
+  if (!toggleBtn) return;
+
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-theme");
+    const isDark = document.body.classList.contains("dark-theme");
+    toggleBtn.setAttribute("aria-pressed", isDark);
+    toggleBtn.innerText = isDark ? "☀️" : "🌙";
+  });
+}
