@@ -1,27 +1,57 @@
 [
   {
     "id": 1,
-    "title": "New RISC-V chips target edge AI workloads",
+    "title": {
+      "en": "New RISC-V chips target edge AI workloads",
+      "zh": "针对边缘 AI 工作负载的新型 RISC-V 芯片",
+      "es": "Nuevos chips RISC-V dirigidos a cargas de trabajo de IA en el borde",
+      "hi": "नए RISC-V चिप्स एज AI वर्कलोड को लक्षित करते हैं",
+      "fr": "De nouvelles puces RISC-V ciblent les charges de travail d'IA Edge"
+    },
     "url": "#"
   },
   {
     "id": 2,
-    "title": "WebGPU lands in all major browsers",
+    "title": {
+      "en": "WebGPU lands in all major browsers",
+      "zh": "WebGPU 已在所有主流浏览器中 officially 推出",
+      "es": "WebGPU llega a todos los navegadores principales",
+      "hi": "WebGPU सभी प्रमुख ब्राउज़रों में उपलब्ध है",
+      "fr": "WebGPU arrive sur tous les principaux navigateurs"
+    },
     "url": "#"
   },
   {
     "id": 3,
-    "title": "Rust 2.0 roadmap officially published",
+    "title": {
+      "en": "Rust 2.0 roadmap officially published",
+      "zh": "Rust 2.0 路线图正式发布",
+      "es": "Publicada oficialmente la hoja de ruta de Rust 2.0",
+      "hi": "Rust 2.0 रोडमैप आधिकारिक तौर पर प्रकाशित",
+      "fr": "La feuille de route de Rust 2.0 officiellement publiée"
+    },
     "url": "#"
   },
   {
     "id": 4,
-    "title": "Linux 6.12 brings real-time preemption",
+    "title": {
+      "en": "Linux 6.12 brings real-time preemption",
+      "zh": "Linux 6.12 带来实时抢占功能",
+      "es": "Linux 6.12 trae preferencia en tiempo real",
+      "hi": "Linux 6.12 रीयल-टाइम प्रीएम्प्शन लाता है",
+      "fr": "Linux 6.12 apporte la préemption en temps réel"
+    },
     "url": "#"
   },
   {
     "id": 5,
-    "title": "ESP32-C6 adds Wi-Fi 6 & 802.15.4 support",
+    "title": {
+      "en": "ESP32-C6 adds Wi-Fi 6 & 802.15.4 support",
+      "zh": "ESP32-C6 新增 Wi-Fi 6 和 802.15.4 支持",
+      "es": "ESP32-C6 añade soporte para Wi-Fi 6 y 802.15.4",
+      "hi": "ESP32-C6 में वाई-फ़ाई 6 और 802.15.4 समर्थन जोड़ा गया",
+      "fr": "L'ESP32-C6 ajoute la prise en charge du Wi-Fi 6 et 802.15.4"
+    },
     "url": "#"
   }
 ]
