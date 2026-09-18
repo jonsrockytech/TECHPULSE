@@ -18,21 +18,20 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="alternate" type="application/rss+xml" title="TechPulse RSS" href="rss.xml">
   <link rel="stylesheet" href="css/style.css">
-  
+
   <style>
-    /* Global Progress Bar & Enhancements */
+    /* Reading Progress Bar */
     #readingProgressBar {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       height: 3px;
       background: #2563eb;
       width: 0%;
       z-index: 10000;
       transition: width 0.1s ease-out;
     }
-    
-    /* Language Selector Styling */
+
+    /* Language Dropdown Selector */
     .lang-select {
       background: var(--bg-secondary, #1e293b);
       color: var(--text-color, #f8fafc);
@@ -44,7 +43,18 @@
       outline: none;
     }
 
-    /* Secret Admin Modal */
+    /* Bookmark Button */
+    .bookmark-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin-left: 8px;
+      transition: transform 0.2s;
+    }
+    .bookmark-btn:hover { transform: scale(1.2); }
+
+    /* Admin Secret Modal Overlay */
     .admin-modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -92,7 +102,7 @@
     }
     .admin-modal-card button:hover { background: #1d4ed8; }
 
-    /* Copy Code Button */
+    /* Code Block Copy Button */
     pre { position: relative; }
     .copy-code-btn {
       position: absolute;
@@ -115,12 +125,10 @@
   <!-- Top Scroll Progress Bar -->
   <div id="readingProgressBar"></div>
 
-  <!-- News Ticker -->
+  <!-- Dynamic News Ticker -->
   <div class="ticker" aria-label="Tech news ticker">
     <span class="ticker-label" id="tickerLabel">Live</span>
-    <div class="ticker-track" id="tickerTrack" aria-hidden="true">
-      <!-- Dynamic Ticker Items loaded via JS -->
-    </div>
+    <div class="ticker-track" id="tickerTrack" aria-hidden="true"></div>
   </div>
 
   <header class="main-header">
@@ -140,7 +148,7 @@
         <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
         <a href="terms.html" data-i18n="nav_terms">Terms</a>
         
-        <!-- Language Switcher (Top Global Languages by Population - No Arabic) -->
+        <!-- Global Language Selector -->
         <select id="languageSelector" class="lang-select" aria-label="Select Language">
           <option value="en">English</option>
           <option value="zh">中文 (Chinese)</option>
@@ -178,6 +186,14 @@
       </div>
 
       <aside class="sidebar" aria-label="Sidebar">
+        <!-- Bookmarked Articles Widget -->
+        <div class="widget">
+          <h3 data-i18n="widget_bookmarks">🔖 Saved Articles</h3>
+          <ul id="bookmarksList" style="list-style:none; padding:0; font-size:0.88rem; color:var(--text-muted);">
+            <li data-i18n="no_bookmarks">No saved articles yet.</li>
+          </ul>
+        </div>
+
         <div class="widget">
           <h3 data-i18n="widget_trending">🔥 Trending</h3>
           <ol class="popular-list" id="trendingList">
@@ -219,7 +235,7 @@
 
   <button id="scrollTopBtn" type="button" aria-label="Scroll to top">↑</button>
 
-  <!-- Admin Login Modal -->
+  <!-- Admin Verification Modal -->
   <div class="admin-modal-overlay" id="adminModal">
     <div class="admin-modal-card">
       <h3>Admin Access</h3>
@@ -230,7 +246,7 @@
 
   <script src="js/main.js"></script>
 
-  <!-- Admin Secret Script -->
+  <!-- Admin Hotkey Verification Script (Ctrl + Shift + A) -->
   <script>
     const SECRET_PIN = "123456";
     const adminBtn = document.getElementById('adminBtn');
