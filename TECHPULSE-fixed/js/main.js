@@ -1,13 +1,12 @@
 /* ==========================================================================
    TechPulse Global Engine
-   - Dynamic i18n Translation Sync
-   - Multilingual News Ticker (data/news.json)
-   - Article View Counter & Reading Time
-   - Local Smart Bookmark System
-   - Reading Progress Bar & Code Copy Button
+   - Automatic Multi-page Translation Sync
+   - Dynamic News Ticker (data/news.json)
+   - Views Counter, Reading Time & Code Copy Button
+   - Local Smart Bookmarks System
    ========================================================================== */
 
-// 1. Translations Dictionary (EN, ZH, ES, HI, FR)
+// 1. القاموس الموحد لجميع صفحات الموقع
 const translations = {
   en: {
     nav_home: "Home", nav_about: "About", nav_contact: "Contact", nav_privacy: "Privacy", nav_terms: "Terms",
@@ -19,8 +18,24 @@ const translations = {
     btn_subscribe: "Subscribe", widget_topics: "🏷 Topics",
     widget_bookmarks: "🔖 Saved Articles", no_bookmarks: "No saved articles yet.",
     read_time: "min read", views: "views",
+    
+    // About
     about_title: "About TechPulse",
-    about_desc: "TechPulse is a dedicated engineering platform for embedded systems, microcontrollers, and hardware tutorials."
+    about_desc: "TechPulse is a dedicated engineering platform for embedded systems, microcontrollers, and hardware tutorials.",
+    
+    // Contact
+    contact_title: "Contact Us",
+    contact_name_ph: "Your Name",
+    contact_msg_ph: "Your Message",
+    btn_send: "Send Message",
+
+    // Privacy
+    privacy_title: "Privacy Policy",
+    privacy_desc: "Your privacy is important to us. TechPulse does not collect personal data without your consent.",
+
+    // Terms
+    terms_title: "Terms of Service",
+    terms_desc: "By accessing TechPulse, you agree to comply with our technical content usage guidelines."
   },
   zh: {
     nav_home: "首页", nav_about: "关于", nav_contact: "联系", nav_privacy: "隐私", nav_terms: "条款",
@@ -33,7 +48,15 @@ const translations = {
     widget_bookmarks: "🔖 已保存的文章", no_bookmarks: "暂无保存的文章。",
     read_time: "分钟阅读", views: "次阅读",
     about_title: "关于 TechPulse",
-    about_desc: "TechPulse 是一个专注于嵌入式系统、微控制器和硬件教程的工程平台。"
+    about_desc: "TechPulse 是一个专注于嵌入式系统、微控制器和硬件教程的工程平台。",
+    contact_title: "联系我们",
+    contact_name_ph: "您的姓名",
+    contact_msg_ph: "您的留言",
+    btn_send: "发送消息",
+    privacy_title: "隐私政策",
+    privacy_desc: "您的隐私对我们很重要。TechPulse 未经您的同意不会收集个人数据。",
+    terms_title: "服务条款",
+    terms_desc: "访问 TechPulse 即表示您同意遵守我们的技术内容使用指南。"
   },
   es: {
     nav_home: "Inicio", nav_about: "Acerca de", nav_contact: "Contacto", nav_privacy: "Privacidad", nav_terms: "Términos",
@@ -46,7 +69,15 @@ const translations = {
     widget_bookmarks: "🔖 Artículos Guardados", no_bookmarks: "No hay artículos guardados.",
     read_time: "min de lectura", views: "vistas",
     about_title: "Acerca de TechPulse",
-    about_desc: "TechPulse es una plataforma de ingeniería dedicada a sistemas embebidos, microcontroladores y tutoriales de hardware."
+    about_desc: "TechPulse es una plataforma de ingeniería dedicada a sistemas embebidos, microcontroladores y tutoriales de hardware.",
+    contact_title: "Contáctenos",
+    contact_name_ph: "Su nombre",
+    contact_msg_ph: "Su mensaje",
+    btn_send: "Enviar mensaje",
+    privacy_title: "Política de Privacidad",
+    privacy_desc: "Su privacidad es importante para nosotros. TechPulse no recopila datos personales sin su consentimiento.",
+    terms_title: "Términos de Servicio",
+    terms_desc: "Al acceder a TechPulse, acepta cumplir con nuestras pautas de uso de contenido técnico."
   },
   hi: {
     nav_home: "होम", nav_about: "हमारे बारे में", nav_contact: "संपर्क करें", nav_privacy: "गोपनीयता", nav_terms: "शर्तें",
@@ -59,7 +90,15 @@ const translations = {
     widget_bookmarks: "🔖 सहेजे गए लेख", no_bookmarks: "अभी तक कोई लेख सहेजा नहीं गया है।",
     read_time: "मिनट पढ़ने का समय", views: "बार देखा गया",
     about_title: "TechPulse के बारे में",
-    about_desc: "TechPulse एम्बेडेड सिस्टम, माइक्रोकंट्रोलर और हार्डवेयर ट्यूटोरियल के लिए एक समर्पित इंजीनियरिंग प्लेटफॉर्म है।"
+    about_desc: "TechPulse एम्बेडेड सिस्टम, माइक्रोकंट्रोलर और हार्डवेयर ट्यूटोरियल के लिए एक समर्पित इंजीनियरिंग प्लेटफॉर्म है।",
+    contact_title: "संपर्क करें",
+    contact_name_ph: "आपका नाम",
+    contact_msg_ph: "आपका संदेश",
+    btn_send: "संदेश भेजें",
+    privacy_title: "गोपनीयता नीति",
+    privacy_desc: "आपकी गोपनीयता हमारे लिए महत्वपूर्ण है। TechPulse आपकी सहमति के बिना व्यक्तिगत डेटा एकत्र नहीं करता है।",
+    terms_title: "सेवा की शर्तें",
+    terms_desc: "TechPulse का उपयोग करके, आप हमारे तकनीकी सामग्री उपयोग दिशानिर्देशों का पालन करने के लिए सहमत होते हैं।"
   },
   fr: {
     nav_home: "Accueil", nav_about: "À propos", nav_contact: "Contact", nav_privacy: "Confidentialité", nav_terms: "Conditions",
@@ -72,13 +111,22 @@ const translations = {
     widget_bookmarks: "🔖 Articles Sauvegardés", no_bookmarks: "Aucun article sauvegardé.",
     read_time: "min de lecture", views: "vues",
     about_title: "À propos de TechPulse",
-    about_desc: "TechPulse est une plateforme d'ingénierie dédiée aux systèmes embarqués, microcontrôleurs et tutoriels matériels."
+    about_desc: "TechPulse est une plateforme d'ingénierie dédiée aux systèmes embarqués, microcontrôleurs et tutoriels matériels.",
+    contact_title: "Contactez-nous",
+    contact_name_ph: "Votre nom",
+    contact_msg_ph: "Votre message",
+    btn_send: "Envoyer le message",
+    privacy_title: "Politique de Confidentialité",
+    privacy_desc: "Votre confidentialité est importante pour nous. TechPulse ne collecte pas de données personnelles sans votre consentement.",
+    terms_title: "Conditions d'Utilisation",
+    terms_desc: "En accédant à TechPulse, vous acceptez de vous conformer à nos directives d'utilisation du contenu technique."
   }
 };
 
 let currentLang = localStorage.getItem("tp_language") || "en";
 let cachedNewsData = [];
 
+// 2. التنفيذ الفوري عند فتح أي صفحة
 document.addEventListener("DOMContentLoaded", () => {
   initLanguageSystem();
   fetchDynamicNewsTicker();
@@ -89,7 +137,43 @@ document.addEventListener("DOMContentLoaded", () => {
   initDarkModeToggle();
 });
 
-// 2. Fetch and Render News Ticker from data/news.json
+// 3. نظام الترجمة الشامل لجميع الصفحات
+function initLanguageSystem() {
+  const selector = document.getElementById("languageSelector");
+  
+  // تطبيق الترجمة المحفوظة على عناصر الصفحة فوراً
+  applyLanguageToAll(currentLang);
+
+  if (selector) {
+    selector.value = currentLang;
+    selector.addEventListener("change", (e) => {
+      currentLang = e.target.value;
+      localStorage.setItem("tp_language", currentLang);
+      applyLanguageToAll(currentLang);
+    });
+  }
+}
+
+function applyLanguageToAll(lang) {
+  const dict = translations[lang] || translations["en"];
+  
+  // ترجمة النصوص العامة
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.innerText = dict[key];
+  });
+
+  // ترجمة حقول الإدخال Placeholders
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    const key = el.getAttribute("data-i18n-ph");
+    if (dict[key]) el.placeholder = dict[key];
+  });
+
+  renderNewsTicker();
+  renderBookmarksList();
+}
+
+// 4. جلب الأخبار وتطبيق الترجمة
 async function fetchDynamicNewsTicker() {
   const track = document.getElementById("tickerTrack");
   if (!track) return;
@@ -120,39 +204,7 @@ function renderNewsTicker() {
   });
 }
 
-// 3. Multi-page Global Language System
-function initLanguageSystem() {
-  const selector = document.getElementById("languageSelector");
-  applyLanguageToAll(currentLang);
-
-  if (selector) {
-    selector.value = currentLang;
-    selector.addEventListener("change", (e) => {
-      currentLang = e.target.value;
-      localStorage.setItem("tp_language", currentLang);
-      applyLanguageToAll(currentLang);
-    });
-  }
-}
-
-function applyLanguageToAll(lang) {
-  const dict = translations[lang] || translations["en"];
-  
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (dict[key]) el.innerText = dict[key];
-  });
-
-  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
-    const key = el.getAttribute("data-i18n-ph");
-    if (dict[key]) el.placeholder = dict[key];
-  });
-
-  renderNewsTicker();
-  renderBookmarksList();
-}
-
-// 4. Smart Bookmarks / Local Favorites System
+// 5. باقي الخدمات الفرعية (Bookmarks, Views, Dark mode)
 function initBookmarkSystem() {
   const articles = document.querySelectorAll(".article-card, article");
 
@@ -163,17 +215,19 @@ function initBookmarkSystem() {
     const artTitle = titleEl.innerText;
     const artId = art.dataset.id || `art_bm_${index}`;
 
-    const btn = document.createElement("button");
-    btn.className = "bookmark-btn";
-    btn.innerText = isBookmarked(artId) ? "📌" : "🔖";
-    titleEl.appendChild(btn);
-
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      toggleBookmark(artId, artTitle);
+    if (!titleEl.querySelector('.bookmark-btn')) {
+      const btn = document.createElement("button");
+      btn.className = "bookmark-btn";
       btn.innerText = isBookmarked(artId) ? "📌" : "🔖";
-      renderBookmarksList();
-    });
+      titleEl.appendChild(btn);
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleBookmark(artId, artTitle);
+        btn.innerText = isBookmarked(artId) ? "📌" : "🔖";
+        renderBookmarksList();
+      });
+    }
   });
 
   renderBookmarksList();
@@ -209,7 +263,6 @@ function renderBookmarksList() {
   container.innerHTML = bookmarks.map(b => `<li style="margin-bottom:6px;">📌 <a href="#" style="color:var(--text-color,#33b3ae);text-decoration:none;">${b.title}</a></li>`).join("");
 }
 
-// 5. Scroll Reading Progress Bar
 function initScrollProgress() {
   const bar = document.getElementById("readingProgressBar");
   if (!bar) return;
@@ -222,14 +275,14 @@ function initScrollProgress() {
   });
 }
 
-// 6. Article Views & Reading Time Counter
 function initViewsAndReadTime() {
   const articles = document.querySelectorAll(".article-card, article");
   if (!articles.length) return;
 
   articles.forEach((article, index) => {
+    if (article.querySelector('.article-stats')) return;
+
     const artId = article.dataset.id || `art_${index}`;
-    
     let views = localStorage.getItem(`views_${artId}`) || Math.floor(Math.random() * 500) + 120;
     views = parseInt(views) + 1;
     localStorage.setItem(`views_${artId}`, views);
@@ -252,7 +305,6 @@ function initViewsAndReadTime() {
   });
 }
 
-// 7. Code Snippet Copy Button
 function enableCodeCopying() {
   document.querySelectorAll("pre").forEach(block => {
     if (block.querySelector('.copy-code-btn')) return;
@@ -273,7 +325,6 @@ function enableCodeCopying() {
   });
 }
 
-// 8. Dark Mode Switcher
 function initDarkModeToggle() {
   const toggleBtn = document.getElementById("darkModeToggle");
   if (!toggleBtn) return;
