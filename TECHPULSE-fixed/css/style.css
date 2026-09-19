@@ -965,6 +965,93 @@ pre { position: relative; }
 }
 .copy-code-btn:hover { background: #475569; }
 
+/* ============ Article image gallery ============ */
+.article-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+}
+.article-gallery .gallery-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+
+/* ============ Comments section ============ */
+.comments-section { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
+.comments-unavailable {
+    background: var(--bg-soft);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ============ Forum page ============ */
+.forum-hero { text-align: center; padding: 30px 0 10px; }
+.forum-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+.forum-cat-card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.forum-cat-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+.forum-cat-card.active { border-color: var(--primary); background: var(--primary-soft); }
+.forum-cat-card .forum-cat-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+.forum-note { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin: 16px 0; }
+#forumThread { min-height: 200px; margin-top: 20px; }
+
+/* ============ News widget (homepage) ============ */
+.news-widget-item {
+    display: block;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+    color: var(--text);
+    text-decoration: none;
+}
+.news-widget-item:last-child { border-bottom: none; }
+.news-widget-item:hover { color: var(--primary); }
+.news-widget-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-inline-end: 6px;
+}
+
+/* ============ RTL (Arabic) support ============
+   Most spacing already uses flex/grid which mirrors automatically with
+   dir="rtl"; these are the few spots that need an explicit override. */
+html[dir="rtl"] { text-align: right; }
+html[dir="rtl"] .ticker-track { animation-direction: reverse; }
+html[dir="rtl"] .back-row,
+html[dir="rtl"] .breadcrumbs { flex-direction: row-reverse; }
+html[dir="rtl"] .card-meta,
+html[dir="rtl"] .share-buttons,
+html[dir="rtl"] .nav-links { flex-wrap: wrap; }
+html[dir="rtl"] .popular-list { padding-inline-start: 0; }
+html[dir="rtl"] .filter-chip,
+html[dir="rtl"] .tag { direction: rtl; }
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
