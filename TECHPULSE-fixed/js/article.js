@@ -1,63 +1,27 @@
 /* ============================================
-   TechPulse — Single Article
+   TechPulse — Single Article (article.js)
+   Requires js/common.js and js/i18n.js to be loaded first.
    ============================================ */
 (function () {
     'use strict';
+    const C = window.TPCommon;
+    const I = window.TPI18N;
 
     const $ = (s, c = document) => c.querySelector(s);
-    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
-
-    function formatDate(iso) {
-        if (!iso) return '';
-        try {
-            return new Date(iso).toLocaleDateString('en-US', {
-                year: 'numeric', month: 'long', day: 'numeric'
-            });
-        } catch { return ''; }
-    }
-
-    function calcReadTime(text) {
-        const words = String(text || '').trim().split(/\s+/).length;
-        return Math.max(1, Math.round(words / 200)) + ' min read';
-    }
 
     function getParam(name) {
         return new URLSearchParams(location.search).get(name);
-    }
-
-    /* Same rule as main.js: data/articles.json is the published source that every
-       visitor sees. localStorage only overrides it as a local admin preview. */
-    async function getArticles() {
-        let published = [];
-        try {
-            const res = await fetch('data/articles.json', { cache: 'no-store' });
-            if (res.ok) {
-                const json = await res.json();
-                if (Array.isArray(json)) published = json;
-            }
-        } catch (err) {
-            console.warn('Could not load data/articles.json', err);
-        }
-
-        try {
-            const local = JSON.parse(localStorage.getItem('tp_articles'));
-            if (Array.isArray(local) && local.length) return local;
-        } catch {}
-
-        return published;
     }
 
     function renderNotFound() {
         $('#articleContainer').innerHTML = `
             <div class="not-found">
                 <div class="not-found-icon">🔍</div>
-                <h1>Article not found</h1>
-                <p>The article you're looking for doesn't exist or has been removed.</p>
-                <a href="index.html" class="btn-primary">← Back to home</a>
+                <h1 data-i18n="not_found_title">${I.t('not_found_title')}</h1>
+                <p data-i18n="not_found_desc">${I.t('not_found_desc')}</p>
+                <a href="index.html" class="btn-primary" data-i18n="back_home">${I.t('back_home')}</a>
             </div>`;
-        document.title = 'Article not found | TechPulse';
+        document.title = `${I.t('not_found_title')} | TechPulse`;
     }
 
     function renderArticle(article, allArticles) {
@@ -65,20 +29,22 @@
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.setAttribute('content', article.excerpt || '');
 
-        // OG
         setMeta('og:title', article.title);
         setMeta('og:description', article.excerpt || '');
         setMeta('og:type', 'article');
 
-        // Breadcrumb
         const crumb = $('#breadcrumbTitle');
         if (crumb) crumb.textContent = article.title.length > 40
             ? article.title.slice(0, 40) + '…'
             : article.title;
 
-        const readTime = calcReadTime(article.content);
+        const lang = I.getLang();
+        const readMin = C.calcReadMinutes(article.content);
+        const views = C.registerView(article.id);
+        const liked = C.hasLiked(article.id);
+        const likeCount = C.getLikeCount(article.id);
+        const bookmarked = C.isBookmarked(article.id);
 
-        // Related
         const related = allArticles
             .filter(a => a.id !== article.id && a.category === article.category)
             .concat(allArticles.filter(a => a.id !== article.id && a.category !== article.category))
@@ -86,49 +52,53 @@
 
         const relatedHTML = related.length ? `
             <section class="related-section">
-                <h2 class="section-heading">📚 Related Articles</h2>
+                <h2 class="section-heading" data-i18n="related_heading">${I.t('related_heading')}</h2>
                 <div class="articles-grid">
                     ${related.map(r => `
                         <article class="article-card">
-                            <span class="card-category">${esc(r.category || 'Tech')}</span>
-                            <h3><a href="article.html?id=${encodeURIComponent(r.id)}">${esc(r.title)}</a></h3>
-                            <p>${esc(r.excerpt)}</p>
-                            <a href="article.html?id=${encodeURIComponent(r.id)}" class="read-more">Read More →</a>
+                            <span class="card-category">${C.esc(r.category || 'Tech')}</span>
+                            <h3><a href="article.html?id=${encodeURIComponent(r.id)}">${C.esc(r.title)}</a></h3>
+                            <p>${C.esc(r.excerpt)}</p>
+                            <a href="article.html?id=${encodeURIComponent(r.id)}" class="read-more" data-i18n="read_more">${I.t('read_more')}</a>
                         </article>
                     `).join('')}
                 </div>
             </section>` : '';
 
-        // Body
         const contentHTML = String(article.content || '')
             .split(/\n\n+/)
-            .map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`)
+            .map(p => `<p>${C.esc(p).replace(/\n/g, '<br>')}</p>`)
             .join('');
 
         const imgHTML = article.image
-            ? `<img src="${esc(article.image)}" alt="${esc(article.title)}" class="article-hero-img" loading="eager">`
+            ? `<img src="${C.esc(article.image)}" alt="${C.esc(article.title)}" class="article-hero-img" loading="eager">`
             : '';
 
         $('#articleContainer').innerHTML = `
             <article class="single-article">
                 <header class="article-header">
-                    <span class="article-category">${esc(article.category || 'Tech')}</span>
-                    <h1>${esc(article.title)}</h1>
+                    <span class="article-category">${C.esc(article.category || 'Tech')}</span>
+                    <h1>${C.esc(article.title)}</h1>
                     <div class="article-meta">
-                        <span>👤 ${esc(article.author || 'TechPulse Team')}</span>
-                        <span>📅 ${formatDate(article.date) || formatDate(new Date().toISOString())}</span>
-                        <span>⏱ ${readTime}</span>
+                        <span>👤 ${C.esc(article.author || 'TechPulse Team')}</span>
+                        <span>📅 ${C.formatDate(article.date, lang) || C.formatDate(new Date().toISOString(), lang)}</span>
+                        <span>⏱ ${readMin} <span data-i18n="read_time">${I.t('read_time')}</span></span>
+                        <span>👁️ ${views} <span data-i18n="views">${I.t('views')}</span></span>
                     </div>
                 </header>
 
                 ${imgHTML}
 
-                <div class="article-excerpt"><p>${esc(article.excerpt)}</p></div>
+                <div class="article-excerpt"><p>${C.esc(article.excerpt)}</p></div>
 
                 <div class="article-content">${contentHTML}</div>
 
                 <div class="share-buttons">
-                    <span class="share-label">Share:</span>
+                    <span class="share-label" data-i18n="share_label">${I.t('share_label')}</span>
+                    <button class="like-btn${liked ? ' liked' : ''}" id="articleLikeBtn" type="button" aria-label="Like">
+                        ${liked ? '❤️' : '🤍'} <span class="like-count">${likeCount}</span>
+                    </button>
+                    <button class="share-btn" id="articleBookmarkBtn" type="button">${bookmarked ? '📌' : '🔖'} Save</button>
                     <button class="share-btn" data-share="twitter" type="button">𝕏 Twitter</button>
                     <button class="share-btn" data-share="facebook" type="button">Facebook</button>
                     <button class="share-btn" data-share="linkedin" type="button">LinkedIn</button>
@@ -137,14 +107,33 @@
                 </div>
 
                 <div class="back-row">
-                    <a href="index.html" class="btn-secondary">← Back to all articles</a>
+                    <a href="index.html" class="btn-secondary" data-i18n="back_all">${I.t('back_all')}</a>
                 </div>
             </article>
             ${relatedHTML}
         `;
 
+        // Like button
+        const likeBtn = $('#articleLikeBtn');
+        if (likeBtn) {
+            likeBtn.addEventListener('click', () => {
+                const { liked, count } = C.toggleLike(article.id);
+                likeBtn.classList.toggle('liked', liked);
+                likeBtn.innerHTML = `${liked ? '❤️' : '🤍'} <span class="like-count">${count}</span>`;
+            });
+        }
+
+        // Bookmark button
+        const bmBtn = $('#articleBookmarkBtn');
+        if (bmBtn) {
+            bmBtn.addEventListener('click', () => {
+                C.toggleBookmark(article.id, article.title);
+                bmBtn.innerHTML = `${C.isBookmarked(article.id) ? '📌' : '🔖'} Save`;
+            });
+        }
+
         // Share buttons
-        document.querySelectorAll('.share-btn').forEach(btn => {
+        document.querySelectorAll('.share-btn[data-share]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.share;
                 const url = encodeURIComponent(location.href);
@@ -178,7 +167,6 @@
         el.setAttribute('content', content || '');
     }
 
-    /* JSON-LD structured data so Google can show this as a rich "Article" result */
     function injectStructuredData(article) {
         const old = document.getElementById('article-jsonld');
         if (old) old.remove();
@@ -218,33 +206,26 @@
         if (top) top.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     })();
 
-    /* ---------- Dark mode (reuse pattern) ---------- */
-    (function darkMode() {
-        const root = document.documentElement;
-        const btn = $('#darkModeToggle');
-        if (!btn) return;
-        const KEY = 'tp_theme';
-        function apply(t) {
-            root.classList.toggle('dark-theme', t === 'dark');
-            btn.textContent = t === 'dark' ? '☀️' : '🌙';
-        }
-        const saved = localStorage.getItem(KEY);
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        apply(saved || (systemDark ? 'dark' : 'light'));
-        btn.addEventListener('click', () => {
-            const next = root.classList.contains('dark-theme') ? 'light' : 'dark';
-            localStorage.setItem(KEY, next);
-            apply(next);
-        });
-    })();
+    let currentArticle = null, currentAllArticles = [];
+
+    document.addEventListener('tp:langchange', () => {
+        if (currentArticle) renderArticle(currentArticle, currentAllArticles);
+    });
 
     document.addEventListener('DOMContentLoaded', async () => {
+        C.initDarkMode();
+        C.initAdminGate();
+        C.initTicker();
+
         const id = getParam('id') || getParam('slug');
         if (!id) { renderNotFound(); return; }
 
-        const articles = await getArticles();
+        const articles = await C.getArticles();
         const article = articles.find(a => a.id === id);
         if (!article) { renderNotFound(); return; }
+
+        currentArticle = article;
+        currentAllArticles = articles;
         renderArticle(article, articles);
         injectStructuredData(article);
     });
