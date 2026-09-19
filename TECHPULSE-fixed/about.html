@@ -4,19 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Us | TechPulse</title>
+  <meta name="description" content="Learn what TechPulse is about: embedded systems, microcontrollers, and hardware tutorials.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    .lang-select {
-      background: var(--bg-secondary, #1e293b);
-      color: var(--text-color, #f8fafc);
-      border: 1px solid #334155;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      outline: none;
-    }
-  </style>
 </head>
 <body>
 
@@ -36,9 +26,8 @@
         <a href="contact.html" data-i18n="nav_contact">Contact</a>
         <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
         <a href="terms.html" data-i18n="nav_terms">Terms</a>
-        
-        <!-- Multi-language Selector -->
-        <select id="languageSelector" class="lang-select">
+
+        <select id="languageSelector" class="lang-select" aria-label="Select Language">
           <option value="en">English</option>
           <option value="zh">中文 (Chinese)</option>
           <option value="es">Español</option>
@@ -53,15 +42,17 @@
   </header>
 
   <main class="container" style="padding: 40px 0;">
-    <h1 data-i18n="about_title">About TechPulse</h1>
-    <p style="margin-top: 16px; line-height: 1.6;" data-i18n="about_desc">
-      TechPulse is a dedicated engineering platform for embedded systems, microcontrollers, and hardware tutorials.
-    </p>
+    <section class="page-content">
+      <h1 data-i18n="about_title">About TechPulse</h1>
+      <p data-i18n="about_desc">
+        TechPulse is a dedicated engineering platform for embedded systems, microcontrollers, and hardware tutorials.
+      </p>
+    </section>
   </main>
 
   <footer class="main-footer">
     <div class="container">
-      <p>&copy; 2026 TechPulse. All rights reserved.</p>
+      <p>&copy; 2026 TechPulse. <span data-i18n="footer_rights">All rights reserved.</span></p>
       <div class="footer-links">
         <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy Policy</a>
         <a href="terms.html" data-i18n="nav_terms">Terms of Service</a>
@@ -69,6 +60,8 @@
     </div>
   </footer>
 
+  <script src="js/common.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

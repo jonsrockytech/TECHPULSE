@@ -12,15 +12,8 @@
   <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 
   <div class="ticker" aria-label="Tech news ticker">
-    <span class="ticker-label">Live</span>
-    <div class="ticker-track" aria-hidden="true">
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-    </div>
+    <span class="ticker-label" id="tickerLabel">Live</span>
+    <div class="ticker-track" id="tickerTrack" aria-hidden="true"></div>
   </div>
 
   <header class="main-header">
@@ -34,12 +27,21 @@
         </a>
       </div>
       <nav class="nav-links" aria-label="Main navigation">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="privacy-policy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="admin.html" class="admin-btn">Admin</a>
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="about.html" data-i18n="nav_about">About</a>
+        <a href="contact.html" data-i18n="nav_contact">Contact</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms</a>
+
+        <select id="languageSelector" class="lang-select" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="zh">中文 (Chinese)</option>
+          <option value="es">Español</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="fr">Français</option>
+        </select>
+
+        <a href="admin.html" id="adminBtn" class="admin-btn" style="display: none;">Admin</a>
         <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
       </nav>
     </div>
@@ -47,30 +49,32 @@
 
   <main class="container">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="index.html">Home</a>
+      <a href="index.html" data-i18n="nav_home">Home</a>
       <span aria-hidden="true">›</span>
-      <a href="index.html">Articles</a>
+      <a href="index.html" data-i18n="breadcrumb_articles">Articles</a>
       <span aria-hidden="true">›</span>
       <span id="breadcrumbTitle" class="current">Article</span>
     </nav>
 
     <div id="articleContainer" class="article-container">
-      <p class="loading-state">Loading article...</p>
+      <p class="loading-state" data-i18n="article_loading">Loading article...</p>
     </div>
   </main>
 
   <footer class="main-footer">
     <div class="container">
-      <p>&copy; 2026 TechPulse. All rights reserved.</p>
+      <p>&copy; 2026 TechPulse. <span data-i18n="footer_rights">All rights reserved.</span></p>
       <div class="footer-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy Policy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms of Service</a>
       </div>
     </div>
   </footer>
 
   <button id="scrollTopBtn" type="button" aria-label="Scroll to top">↑</button>
 
+  <script src="js/common.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/article.js"></script>
 </body>
 </html>

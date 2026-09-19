@@ -18,107 +18,6 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="alternate" type="application/rss+xml" title="TechPulse RSS" href="rss.xml">
   <link rel="stylesheet" href="css/style.css">
-
-  <style>
-    /* Reading Progress Bar */
-    #readingProgressBar {
-      position: fixed;
-      top: 0; left: 0;
-      height: 3px;
-      background: #2563eb;
-      width: 0%;
-      z-index: 10000;
-      transition: width 0.1s ease-out;
-    }
-
-    /* Language Dropdown Selector */
-    .lang-select {
-      background: var(--bg-secondary, #1e293b);
-      color: var(--text-color, #f8fafc);
-      border: 1px solid #334155;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      outline: none;
-    }
-
-    /* Bookmark Button */
-    .bookmark-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.1rem;
-      margin-left: 8px;
-      transition: transform 0.2s;
-    }
-    .bookmark-btn:hover { transform: scale(1.2); }
-
-    /* Admin Secret Modal Overlay */
-    .admin-modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.75);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      backdrop-filter: blur(4px);
-    }
-    .admin-modal-overlay.active { display: flex; }
-    .admin-modal-card {
-      background: #1e293b;
-      color: #f8fafc;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      width: 100%;
-      max-width: 360px;
-      text-align: center;
-      border: 1px solid #334155;
-      font-family: inherit;
-    }
-    .admin-modal-card h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.25rem; }
-    .admin-modal-card input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #fff;
-      box-sizing: border-box;
-      outline: none;
-    }
-    .admin-modal-card button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #2563eb;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .admin-modal-card button:hover { background: #1d4ed8; }
-
-    /* Code Block Copy Button */
-    pre { position: relative; }
-    .copy-code-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #334155;
-      color: #ffffff;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .copy-code-btn:hover { background: #475569; }
-  </style>
 </head>
 <body>
 
@@ -147,7 +46,7 @@
         <a href="contact.html" data-i18n="nav_contact">Contact</a>
         <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
         <a href="terms.html" data-i18n="nav_terms">Terms</a>
-        
+
         <!-- Global Language Selector -->
         <select id="languageSelector" class="lang-select" aria-label="Select Language">
           <option value="en">English</option>
@@ -157,7 +56,7 @@
           <option value="fr">Français</option>
         </select>
 
-        <!-- Hidden Admin Link -->
+        <!-- Admin link: hidden for every visitor by default (see js/common.js) -->
         <a href="admin.html" id="adminBtn" class="admin-btn" style="display: none;">Admin</a>
         <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
       </nav>
@@ -206,8 +105,9 @@
           <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:12px;" data-i18n="newsletter_desc">
             Weekly digest of the best tech articles. No spam.
           </p>
-          <form class="newsletter-form" novalidate>
-            <input type="email" placeholder="you@example.com" aria-label="Email address" required>
+          <form class="newsletter-form" name="newsletter" data-netlify="true" novalidate>
+            <input type="hidden" name="form-name" value="newsletter">
+            <input type="email" name="email" placeholder="you@example.com" aria-label="Email address" required>
             <button type="submit" data-i18n="btn_subscribe">Subscribe</button>
             <p class="newsletter-msg" aria-live="polite"></p>
           </form>
@@ -223,7 +123,7 @@
 
   <footer class="main-footer">
     <div class="container">
-      <p>&copy; 2026 TechPulse. All rights reserved.</p>
+      <p>&copy; 2026 TechPulse. <span data-i18n="footer_rights">All rights reserved.</span></p>
       <div class="footer-links">
         <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy Policy</a>
         <a href="terms.html" data-i18n="nav_terms">Terms of Service</a>
@@ -235,53 +135,8 @@
 
   <button id="scrollTopBtn" type="button" aria-label="Scroll to top">↑</button>
 
-  <!-- Admin Verification Modal -->
-  <div class="admin-modal-overlay" id="adminModal">
-    <div class="admin-modal-card">
-      <h3>Admin Access</h3>
-      <input type="password" id="adminPassInput" placeholder="Enter Security PIN..." autocomplete="off">
-      <button onclick="verifyAdminAccess()">Login</button>
-    </div>
-  </div>
-
+  <script src="js/common.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
-
-  <!-- Admin Hotkey Verification Script (Ctrl + Shift + A) -->
-  <script>
-    const SECRET_PIN = "123456";
-    const adminBtn = document.getElementById('adminBtn');
-    const adminModal = document.getElementById('adminModal');
-    const adminPassInput = document.getElementById('adminPassInput');
-
-    document.addEventListener("DOMContentLoaded", () => {
-      if (sessionStorage.getItem("tp_admin_authenticated") === "true") {
-        adminBtn.style.display = "inline-block";
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        adminModal.classList.add('active');
-        adminPassInput.focus();
-      }
-      if (e.key === "Escape") {
-        adminModal.classList.remove('active');
-      }
-    });
-
-    function verifyAdminAccess() {
-      if (adminPassInput.value.trim() === SECRET_PIN) {
-        sessionStorage.setItem("tp_admin_authenticated", "true");
-        adminBtn.style.display = "inline-block";
-        adminModal.classList.remove('active');
-        adminPassInput.value = "";
-        window.location.href = "admin.html";
-      } else {
-        alert("Incorrect PIN!");
-        adminPassInput.value = "";
-      }
-    }
-  </script>
 </body>
 </html>

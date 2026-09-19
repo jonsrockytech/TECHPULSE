@@ -14,15 +14,8 @@
 </head>
 <body>
   <div class="ticker" aria-label="Tech news ticker">
-    <span class="ticker-label">Live</span>
-    <div class="ticker-track" aria-hidden="true">
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-      <span class="ticker-item"><a href="#">New RISC-V chips target edge AI workloads</a></span>
-      <span class="ticker-item"><a href="#">WebGPU lands in all major browsers</a></span>
-      <span class="ticker-item"><a href="#">Rust 2.0 roadmap officially published</a></span>
-    </div>
+    <span class="ticker-label" id="tickerLabel">Live</span>
+    <div class="ticker-track" id="tickerTrack" aria-hidden="true"></div>
   </div>
   <header class="main-header">
     <div class="container">
@@ -34,13 +27,22 @@
           <span>TechPulse</span>
         </a>
       </div>
-      <nav class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="contact.html" class="active">Contact</a>
-        <a href="privacy-policy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="admin.html" class="admin-btn">Admin</a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="about.html" data-i18n="nav_about">About</a>
+        <a href="contact.html" class="active" data-i18n="nav_contact">Contact</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms</a>
+
+        <select id="languageSelector" class="lang-select" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="zh">中文 (Chinese)</option>
+          <option value="es">Español</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="fr">Français</option>
+        </select>
+
+        <a href="admin.html" id="adminBtn" class="admin-btn" style="display: none;">Admin</a>
         <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
       </nav>
     </div>
@@ -48,8 +50,8 @@
 
   <main class="container">
     <section class="page-content">
-      <h1>Contact Us</h1>
-      <p>Have questions, feedback, or editorial inquiries? Reach out via the form below or send us an email.</p>
+      <h1 data-i18n="contact_title">Contact Us</h1>
+      <p data-i18n="contact_intro">Have questions, feedback, or editorial inquiries? Reach out via the form below or send us an email.</p>
 
       <!--
         This form is wired for Netlify Forms (free, no backend needed since the
@@ -74,36 +76,40 @@
         </p>
 
         <div class="form-group">
-          <label for="cname">Full Name</label>
+          <label for="cname" data-i18n="contact_name_ph">Full Name</label>
           <input type="text" id="cname" name="name" required autocomplete="name">
         </div>
         <div class="form-group">
-          <label for="cemail">Email</label>
+          <label for="cemail" data-i18n="contact_email_ph">Email</label>
           <input type="email" id="cemail" name="email" required autocomplete="email">
         </div>
         <div class="form-group">
-          <label for="cmsg">Message</label>
+          <label for="cmsg" data-i18n="contact_msg_ph">Message</label>
           <textarea id="cmsg" name="message" rows="5" required></textarea>
         </div>
-        <button type="submit" class="btn-primary">Send Message</button>
+        <button type="submit" class="btn-primary" data-i18n="btn_send">Send Message</button>
         <p class="form-status" id="contactStatus" aria-live="polite"></p>
       </form>
 
       <p style="margin-top:20px">
-        Or email us directly at <strong>contact@techpulse.example.com</strong>
+        <span data-i18n="contact_email_intro">Or email us directly at</span>
+        <strong>contact@techpulse.example.com</strong>
       </p>
     </section>
   </main>
 
   <footer class="main-footer">
     <div class="container">
-      <p>&copy; 2026 TechPulse. All rights reserved.</p>
+      <p>&copy; 2026 TechPulse. <span data-i18n="footer_rights">All rights reserved.</span></p>
       <div class="footer-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy Policy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms of Service</a>
       </div>
     </div>
   </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
   <script>
     (function () {
@@ -127,16 +133,15 @@
           body: encode(formData)
         })
           .then(() => {
-            status.textContent = '✓ Thanks! Your message has been sent.';
-            window.showToast && window.showToast('Message sent');
+            status.textContent = window.TPI18N.t('contact_success');
+            window.showToast && window.showToast(window.TPI18N.t('contact_success'));
             form.reset();
           })
           .catch(() => {
-            status.textContent = '✗ Something went wrong. Please email us directly instead.';
+            status.textContent = window.TPI18N.t('contact_error');
           });
       });
     })();
   </script>
-  <script src="js/main.js"></script>
 </body>
 </html>
