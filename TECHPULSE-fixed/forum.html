@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Forum | TechPulse</title>
+  <meta name="description" content="Join the TechPulse community forum: discuss Technology, Petroleum, Natural Gas, and Programming with other members.">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="ticker" aria-label="Tech news ticker">
+    <span class="ticker-label" id="tickerLabel">Live</span>
+    <div class="ticker-track" id="tickerTrack" aria-hidden="true"></div>
+  </div>
+
+  <header class="main-header">
+    <div class="container">
+      <div class="logo">
+        <a href="index.html" aria-label="TechPulse Home">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>TechPulse</span>
+        </a>
+      </div>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="forum.html" class="active" data-i18n="nav_forum">Forum</a>
+        <a href="index.html#newsWidget" data-i18n="nav_news">News</a>
+        <a href="about.html" data-i18n="nav_about">About</a>
+        <a href="contact.html" data-i18n="nav_contact">Contact</a>
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms</a>
+
+        <select id="languageSelector" class="lang-select" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="zh">中文 (Chinese)</option>
+          <option value="es">Español</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="fr">Français</option>
+          <option value="ar">العربية</option>
+        </select>
+
+        <a href="admin.html" id="adminBtn" class="admin-btn" style="display: none;">Admin</a>
+        <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="forum-hero">
+      <h1 data-i18n="forum_hero_title">TechPulse Community Forum</h1>
+      <p data-i18n="forum_hero_desc">Ask questions, share your projects, and discuss Technology, Petroleum, Natural Gas, and Programming with other members.</p>
+    </section>
+
+    <div class="forum-categories" id="forumCategories">
+      <button type="button" class="forum-cat-card" data-cat="technology">
+        <span class="forum-cat-icon">💻</span>
+        <span data-i18n="forum_cat_tech">Technology Discussions</span>
+      </button>
+      <button type="button" class="forum-cat-card" data-cat="petroleum">
+        <span class="forum-cat-icon">🛢️</span>
+        <span data-i18n="forum_cat_petroleum">Petroleum Discussions</span>
+      </button>
+      <button type="button" class="forum-cat-card" data-cat="gas">
+        <span class="forum-cat-icon">🔥</span>
+        <span data-i18n="forum_cat_gas">Natural Gas Discussions</span>
+      </button>
+      <button type="button" class="forum-cat-card" data-cat="programming">
+        <span class="forum-cat-icon">⌨️</span>
+        <span data-i18n="forum_cat_programming">Programming Discussions</span>
+      </button>
+    </div>
+
+    <p class="forum-note" data-i18n="forum_note">Discussions are powered by Disqus and are visible to every visitor.</p>
+
+    <div id="forumThread"></div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <p>&copy; 2026 TechPulse. <span data-i18n="footer_rights">All rights reserved.</span></p>
+      <div class="footer-links">
+        <a href="privacy-policy.html" data-i18n="nav_privacy">Privacy Policy</a>
+        <a href="terms.html" data-i18n="nav_terms">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/live-news.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    (function () {
+      const cards = document.querySelectorAll('.forum-cat-card');
+      const thread = document.getElementById('forumThread');
+
+      function openCategory(cat, card) {
+        cards.forEach(c => c.classList.toggle('active', c === card));
+        window.TPCommon.loadDisqusThread(thread, {
+          identifier: 'forum-' + cat,
+          url: location.href.split('#')[0] + '#' + cat,
+          title: 'TechPulse Forum — ' + cat
+        });
+        thread.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => openCategory(card.dataset.cat, card));
+      });
+
+      // Open the first category by default once the page (and i18n) is ready.
+      document.addEventListener('DOMContentLoaded', () => {
+        if (cards.length) openCategory(cards[0].dataset.cat, cards[0]);
+      });
+    })();
+  </script>
+</body>
+</html>
