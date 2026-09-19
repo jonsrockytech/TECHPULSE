@@ -1,5 +1,6 @@
 /* ============================================
    TechPulse — Admin Controller
+   Requires js/common.js to be loaded first (article loading, esc, slugify).
    ============================================ */
 (function () {
     'use strict';
@@ -7,84 +8,33 @@
     const $  = (s, c = document) => c.querySelector(s);
     const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
     const STORAGE_KEY = 'tp_articles';
-    const CATEGORIES = ['Embedded','Web','AI','Linux','Rust','IoT','Security','DevOps','Hardware','Tutorials'];
+    const C = window.TPCommon;
+    const esc = C.esc;
+    const slugify = C.slugify;
 
-    /* ---------- Storage ---------- */
-    function getArticles() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) return JSON.parse(raw);
-        } catch {}
-        return [
-            {
-                id: '1',
-                title: 'ESP32 & ESP8266 Microcontroller Programming',
-                excerpt: 'Comprehensive guide to sensor interfacing, telemetry, and Over-The-Air (OTA) firmware updates.',
-                content: 'Detailed setup using C++ and MicroPython for real-time sensor processing.\n\nThis article walks through the entire workflow of programming ESP32 microcontrollers — from initial setup to advanced sensor integration and remote OTA updates.',
-                category: 'Embedded',
-                author: 'TechPulse Team',
-                date: new Date().toISOString().slice(0, 10),
-                readTime: '8 min',
-                tags: ['esp32', 'iot', 'firmware'],
-                image: '',
-                likes: 0,
-                featured: false
-            }
-        ];
+    /* ---------- Storage ----------
+       The published data/articles.json (bundled with the site) is always
+       the baseline. Anything saved here is layered on top in this browser's
+       localStorage until you hit "Export ZIP" and redeploy — this lets you
+       proof changes before they go live, same as before. */
+    let articlesCache = [];
+
+    async function loadArticles() {
+        articlesCache = await C.getArticles(true);
+        return articlesCache;
     }
+
+    function getArticles() { return articlesCache; }
 
     function saveArticles(list) {
+        articlesCache = list;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    }
-
-    /* ---------- Helpers ---------- */
-    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
-        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
-
-    function slugify(str) {
-        return String(str).toLowerCase().trim()
-            .replace(/[^\w\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '');
     }
 
     function toast(msg) { window.showToast && window.showToast(msg); }
 
-    /* ---------- Toast ---------- */
-    let toastEl, toastTimer;
-    function showToast(msg) {
-        if (!toastEl) {
-            toastEl = document.createElement('div');
-            toastEl.className = 'toast';
-            document.body.appendChild(toastEl);
-        }
-        toastEl.textContent = msg;
-        toastEl.classList.add('show');
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
-    }
-    window.showToast = showToast;
-
     /* ---------- Dark mode ---------- */
-    (function darkMode() {
-        const root = document.documentElement;
-        const btn = $('#darkModeToggle');
-        if (!btn) return;
-        const KEY = 'tp_theme';
-        function apply(t) {
-            root.classList.toggle('dark-theme', t === 'dark');
-            btn.textContent = t === 'dark' ? '☀️' : '🌙';
-        }
-        const saved = localStorage.getItem(KEY);
-        apply(saved || 'light');
-        btn.addEventListener('click', () => {
-            const next = root.classList.contains('dark-theme') ? 'light' : 'dark';
-            localStorage.setItem(KEY, next);
-            apply(next);
-        });
-    })();
+    C.initDarkMode();
 
     /* ---------- Element refs ---------- */
     const form = $('#article-form');
@@ -105,10 +55,48 @@
     const formTitle = $('#form-title');
     const resetBtn = $('#reset-btn');
     const listContainer = $('#admin-articles-list');
+    const galleryStrip = $('#gallery-strip');
+    const galleryFileInput = $('#gallery-file');
+    const addGalleryBtn = $('#add-gallery-btn');
 
     let currentImageData = '';
+    let currentGalleryImages = []; // array of data URLs / paths
 
-    /* ---------- Image upload ---------- */
+    /* ---------- Bilingual field tabs (title / excerpt / content) ----------
+       Each of these three fields is stored as {en, ar}. The visible inputs
+       always show one language at a time; switching tabs stashes the
+       current values into the draft object first. */
+    let adminLang = 'en';
+    let i18nDraft = { title: { en: '', ar: '' }, excerpt: { en: '', ar: '' }, content: { en: '', ar: '' } };
+
+    function stashCurrentLangInputs() {
+        i18nDraft.title[adminLang] = titleInput.value;
+        i18nDraft.excerpt[adminLang] = excerptInput.value;
+        i18nDraft.content[adminLang] = contentInput.value;
+    }
+    function loadLangIntoInputs(lang) {
+        titleInput.value = i18nDraft.title[lang] || '';
+        excerptInput.value = i18nDraft.excerpt[lang] || '';
+        contentInput.value = i18nDraft.content[lang] || '';
+    }
+    $$('.lang-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const next = tab.dataset.adminlang;
+            if (next === adminLang) return;
+            stashCurrentLangInputs();
+            adminLang = next;
+            $$('.lang-tab').forEach(t => t.classList.toggle('active', t === tab));
+            loadLangIntoInputs(adminLang);
+        });
+    });
+
+    function resetI18nDraft() {
+        i18nDraft = { title: { en: '', ar: '' }, excerpt: { en: '', ar: '' }, content: { en: '', ar: '' } };
+        adminLang = 'en';
+        $$('.lang-tab').forEach(t => t.classList.toggle('active', t.dataset.adminlang === 'en'));
+    }
+
+    /* ---------- Featured image upload ---------- */
     imagePreview.addEventListener('click', () => imageInput.click());
     imageInput.addEventListener('change', () => {
         const file = imageInput.files[0];
@@ -136,6 +124,42 @@
         });
     }
 
+    /* ---------- Gallery images (multiple) ---------- */
+    function renderGalleryStrip() {
+        galleryStrip.innerHTML = currentGalleryImages.map((src, i) => `
+            <div class="gallery-thumb" data-idx="${i}">
+                <img src="${esc(src)}" alt="Gallery image ${i + 1}">
+                <button type="button" class="remove-thumb" data-remove-gallery="${i}" aria-label="Remove">×</button>
+            </div>
+        `).join('');
+    }
+    addGalleryBtn.addEventListener('click', () => galleryFileInput.click());
+    galleryFileInput.addEventListener('change', () => {
+        const files = Array.from(galleryFileInput.files || []);
+        let remaining = files.length;
+        if (!remaining) return;
+        files.forEach(file => {
+            if (file.size > 2 * 1024 * 1024) {
+                toast(`Skipped "${file.name}" (max 2 MB)`);
+                if (--remaining === 0) galleryFileInput.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                currentGalleryImages.push(ev.target.result);
+                renderGalleryStrip();
+                if (--remaining === 0) galleryFileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+    galleryStrip.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-remove-gallery]');
+        if (!btn) return;
+        currentGalleryImages.splice(Number(btn.dataset.removeGallery), 1);
+        renderGalleryStrip();
+    });
+
     /* ---------- Auto-slug ---------- */
     let slugEdited = false;
     slugInput.addEventListener('input', () => { slugEdited = true; });
@@ -145,7 +169,7 @@
 
     /* ---------- Render list ---------- */
     function renderAdminList() {
-        const articles = getArticles().sort((a, b) =>
+        const articles = [...getArticles()].sort((a, b) =>
             (b.date || '').localeCompare(a.date || '')
         );
 
@@ -165,13 +189,18 @@
             return;
         }
 
-        listContainer.innerHTML = articles.map(art => `
+        listContainer.innerHTML = articles.map(art => {
+            const title = C.pickLocalized(art.title, 'en');
+            const excerpt = C.pickLocalized(art.excerpt, 'en');
+            const hasAr = art.title && art.title.ar;
+            return `
             <div class="admin-article-item">
                 <div>
-                    <h4>${esc(art.title)}</h4>
-                    <p>${esc(art.excerpt)}</p>
+                    <h4>${esc(title)} ${hasAr ? '<span title="Has Arabic translation">🇩🇿</span>' : ''}</h4>
+                    <p>${esc(excerpt)}</p>
                     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">
                         ${esc(art.category || '—')} · ${esc(art.date || '')} · ${art.featured ? '★ Featured' : ''}
+                        ${Array.isArray(art.images) && art.images.length ? ` · 🖼 ${art.images.length} gallery image(s)` : ''}
                     </p>
                 </div>
                 <div class="item-btns">
@@ -179,26 +208,28 @@
                     <button type="button" data-delete="${esc(art.id)}" class="btn-delete">Delete</button>
                 </div>
             </div>
-        `).join('');
+        `; }).join('');
     }
 
     /* ---------- Form submit ---------- */
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        stashCurrentLangInputs();
+
         const articles = getArticles();
         const id = articleIdInput.value || Date.now().toString();
-        const title = titleInput.value.trim();
-        const excerpt = excerptInput.value.trim();
-        const content = contentInput.value.trim();
+        const title = i18nDraft.title;
+        const excerpt = i18nDraft.excerpt;
+        const content = i18nDraft.content;
         const category = categoryInput.value;
         const author = authorInput.value.trim() || 'TechPulse Team';
         const date = dateInput.value || new Date().toISOString().slice(0, 10);
-        const readTime = readTimeInput.value.trim() || calcReadTime(content);
+        const readTime = readTimeInput.value.trim() || calcReadTime(content.en);
         const tags = tagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
         const featured = featuredInput.checked;
 
-        if (!title || !excerpt || !content || !category) {
-            toast('Please fill all required fields');
+        if (!title.en || !excerpt.en || !content.en || !category) {
+            toast('Please fill all required fields (English is the minimum required language)');
             return;
         }
 
@@ -206,8 +237,9 @@
             id, title, excerpt, content, category, author, date, readTime, tags,
             featured,
             image: currentImageData || '',
+            images: currentGalleryImages.slice(),
             likes: 0,
-            slug: slugInput.value.trim() || slugify(title)
+            slug: slugInput.value.trim() || slugify(title.en)
         };
 
         const idx = articles.findIndex(a => a.id === id);
@@ -237,21 +269,33 @@
         if (delBtn) deleteArticle(delBtn.dataset.delete);
     });
 
+    function asLangMap(field) {
+        // Normalizes a legacy plain-string field into {en, ar} for editing.
+        if (field && typeof field === 'object') return { en: field.en || '', ar: field.ar || '' };
+        return { en: field || '', ar: '' };
+    }
+
     function editArticle(id) {
         const art = getArticles().find(a => a.id === id);
         if (!art) return;
         articleIdInput.value = art.id;
-        titleInput.value = art.title || '';
+
+        i18nDraft.title = asLangMap(art.title);
+        i18nDraft.excerpt = asLangMap(art.excerpt);
+        i18nDraft.content = asLangMap(art.content);
+        adminLang = 'en';
+        $$('.lang-tab').forEach(t => t.classList.toggle('active', t.dataset.adminlang === 'en'));
+        loadLangIntoInputs('en');
+
         slugInput.value = art.slug || '';
         slugEdited = true;
-        excerptInput.value = art.excerpt || '';
-        contentInput.value = art.content || '';
         categoryInput.value = art.category || '';
         authorInput.value = art.author || '';
         dateInput.value = art.date || '';
         readTimeInput.value = art.readTime || '';
         tagsInput.value = (art.tags || []).join(', ');
         featuredInput.checked = !!art.featured;
+
         currentImageData = art.image || '';
         if (currentImageData) {
             imagePreview.innerHTML = `<img src="${currentImageData}" alt="Preview">`;
@@ -260,6 +304,10 @@
             imagePreview.innerHTML = '<span class="image-hint">Click to upload an image (max 2 MB)</span>';
             removeImageBtn.style.display = 'none';
         }
+
+        currentGalleryImages = Array.isArray(art.images) ? art.images.slice() : [];
+        renderGalleryStrip();
+
         formTitle.textContent = 'Edit Article';
         resetBtn.style.display = 'inline-block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -277,9 +325,13 @@
         form.reset();
         articleIdInput.value = '';
         slugEdited = false;
+        resetI18nDraft();
+        loadLangIntoInputs('en');
         currentImageData = '';
         imagePreview.innerHTML = '<span class="image-hint">Click to upload an image (max 2 MB)</span>';
         removeImageBtn.style.display = 'none';
+        currentGalleryImages = [];
+        renderGalleryStrip();
         formTitle.textContent = 'Add New Article';
         resetBtn.style.display = 'none';
         dateInput.value = new Date().toISOString().slice(0, 10);
@@ -302,16 +354,25 @@
             const imagesFolder = zip.folder('assets/images');
             const clean = [];
 
-            for (const a of articles) {
-                const copy = { ...a };
-                if (copy.image && copy.image.startsWith('data:')) {
-                    const m = copy.image.match(/^data:(.+?);base64,(.+)$/);
+            const embedIfDataUrl = (src, baseName, index) => {
+                if (src && src.startsWith('data:')) {
+                    const m = src.match(/^data:(.+?);base64,(.+)$/);
                     if (m) {
                         const ext = (m[1].split('/')[1] || 'jpg').replace('jpeg', 'jpg');
-                        const filename = `${copy.slug || copy.id}.${ext}`;
+                        const filename = `${baseName}${index != null ? '-' + index : ''}.${ext}`;
                         imagesFolder.file(filename, m[2], { base64: true });
-                        copy.image = `assets/images/${filename}`;
+                        return `assets/images/${filename}`;
                     }
+                }
+                return src;
+            };
+
+            for (const a of articles) {
+                const copy = { ...a };
+                const base = copy.slug || copy.id;
+                copy.image = embedIfDataUrl(copy.image, base, null);
+                if (Array.isArray(copy.images)) {
+                    copy.images = copy.images.map((src, i) => embedIfDataUrl(src, base, i + 1));
                 }
                 clean.push(copy);
             }
@@ -327,7 +388,7 @@
             a.click();
             a.remove();
             URL.revokeObjectURL(url);
-            toast('📦 ZIP exported');
+            toast('📦 ZIP exported — replace data/articles.json (and assets/images/) on your live site with the contents of this ZIP to publish.');
         });
     }
 
@@ -360,5 +421,5 @@
 
     /* ---------- Init ---------- */
     dateInput.value = new Date().toISOString().slice(0, 10);
-    renderAdminList();
+    loadArticles().then(renderAdminList);
 })();

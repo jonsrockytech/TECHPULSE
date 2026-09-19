@@ -18,6 +18,7 @@
     C.initDarkMode();
     C.initAdminGate();
     C.initTicker();
+    initNewsWidget();
     initScrollProgress();
     initScrollTopButton();
     enableCodeCopying();
@@ -28,8 +29,38 @@
 
   document.addEventListener('tp:langchange', () => {
     renderBookmarksList();
-    if (document.getElementById('articles-container')) renderArticlesUI();
+    renderNewsWidget();
+    if (document.getElementById('articles-container')) {
+      renderFilters();
+      renderArticlesUI();
+      renderTrending();
+    }
   });
+
+  /* ---------- Homepage "Latest News" widget (real, hourly-refreshed) ---------- */
+  let newsFeedCache = [];
+  function initNewsWidget() {
+    const list = document.getElementById('newsWidgetList');
+    if (!list) return;
+    if (window.TPLiveNews) {
+      window.TPLiveNews.startAutoRefresh(feed => { newsFeedCache = feed; renderNewsWidget(); });
+    }
+  }
+
+  function renderNewsWidget() {
+    const list = document.getElementById('newsWidgetList');
+    if (!list || !newsFeedCache.length) return;
+    const lang = I.getLang();
+    const items = newsFeedCache.slice(0, 6);
+    list.innerHTML = items.map(item => {
+      const titleText = (item.title && item.title[lang]) ? item.title[lang] : (item.title.en || item.title);
+      const tagKey = item.category === 'oil_gas' ? 'news_oil_label' : 'news_tech_label';
+      const href = item.url && item.url !== '#' ? item.url : '#';
+      return `<a class="news-widget-item" href="${C.esc(href)}"${href !== '#' ? ' target="_blank" rel="noopener"' : ''}>
+        <span class="news-widget-tag">${C.esc(I.t(tagKey))}</span>${C.esc(titleText)}
+      </a>`;
+    }).join('');
+  }
 
   /* ---------- Bookmarks widget ---------- */
   function renderBookmarksList() {
@@ -142,9 +173,12 @@
   function renderFilters() {
     const box = document.getElementById('filters');
     if (!box) return;
+    const lang = I.getLang();
     const cats = categoriesOf(allArticles);
-    box.innerHTML = `<button type="button" class="filter-chip active" data-cat="all">${C.esc(I.t('filter_all'))}</button>` +
-      cats.map(c => `<button type="button" class="filter-chip" data-cat="${C.esc(c)}">${C.esc(c)}</button>`).join('');
+    const chip = (cat, label) =>
+      `<button type="button" class="filter-chip${activeCategory === cat ? ' active' : ''}" data-cat="${C.esc(cat)}">${C.esc(label)}</button>`;
+    box.innerHTML = chip('all', I.t('filter_all')) +
+      cats.map(c => chip(c, C.translateCategory(c, lang))).join('');
 
     box.querySelectorAll('.filter-chip').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -174,6 +208,7 @@
   function renderTrending() {
     const list = document.getElementById('trendingList');
     if (!list) return;
+    const lang = I.getLang();
     const top = [...allArticles]
       .sort((a, b) => C.getViews(b.id) - C.getViews(a.id))
       .slice(0, 5);
@@ -181,7 +216,7 @@
     list.innerHTML = top.map((a, i) => `
       <li>
         <span class="popular-num">${i + 1}</span>
-        <a href="article.html?id=${encodeURIComponent(a.id)}">${C.esc(a.title)}</a>
+        <a href="article.html?id=${encodeURIComponent(a.id)}">${C.esc(C.pickLocalized(a.title, lang))}</a>
       </li>
     `).join('');
   }
@@ -195,12 +230,14 @@
     });
   }
 
-  function matchesFilters(a) {
+  function matchesFilters(a, lang) {
     const inCategory = activeCategory === 'all' || a.category === activeCategory;
     if (!inCategory) return false;
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
-    const haystack = [a.title, a.excerpt, a.category, ...(a.tags || [])].join(' ').toLowerCase();
+    const title = C.pickLocalized(a.title, lang);
+    const excerpt = C.pickLocalized(a.excerpt, lang);
+    const haystack = [title, excerpt, a.category, ...(a.tags || [])].join(' ').toLowerCase();
     return haystack.includes(term);
   }
 
@@ -209,7 +246,7 @@
     if (!grid) return;
     const lang = I.getLang();
     const visible = allArticles
-      .filter(matchesFilters)
+      .filter(a => matchesFilters(a, lang))
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
     if (!visible.length) {
@@ -217,7 +254,7 @@
       return;
     }
 
-    grid.innerHTML = visible.map(a => renderCard(a, lang)).join('');
+    grid.innerHTML = visible.map(a => renderCard(C.localizeArticle(a, lang), lang)).join('');
     wireCardInteractions(grid);
   }
 
@@ -232,7 +269,7 @@
     return `
       <article class="article-card" data-id="${C.esc(a.id)}">
         ${imgHTML}
-        <span class="card-category">${C.esc(a.category || 'Tech')}</span>
+        <span class="card-category">${C.esc(C.translateCategory(a.category, lang))}</span>
         <h3><a href="article.html?id=${encodeURIComponent(a.id)}">${C.esc(a.title)}</a></h3>
         <p>${C.esc(a.excerpt || '')}</p>
         <div class="card-meta">

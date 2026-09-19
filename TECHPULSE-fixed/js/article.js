@@ -24,7 +24,10 @@
         document.title = `${I.t('not_found_title')} | TechPulse`;
     }
 
-    function renderArticle(article, allArticles) {
+    function renderArticle(rawArticle, rawAllArticles) {
+        const lang = I.getLang();
+        const article = C.localizeArticle(rawArticle, lang);
+
         document.title = `${article.title} | TechPulse`;
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.setAttribute('content', article.excerpt || '');
@@ -38,17 +41,17 @@
             ? article.title.slice(0, 40) + '…'
             : article.title;
 
-        const lang = I.getLang();
         const readMin = C.calcReadMinutes(article.content);
         const views = C.registerView(article.id);
         const liked = C.hasLiked(article.id);
         const likeCount = C.getLikeCount(article.id);
         const bookmarked = C.isBookmarked(article.id);
 
-        const related = allArticles
-            .filter(a => a.id !== article.id && a.category === article.category)
-            .concat(allArticles.filter(a => a.id !== article.id && a.category !== article.category))
-            .slice(0, 3);
+        const related = rawAllArticles
+            .filter(a => a.id !== rawArticle.id && a.category === rawArticle.category)
+            .concat(rawAllArticles.filter(a => a.id !== rawArticle.id && a.category !== rawArticle.category))
+            .slice(0, 3)
+            .map(a => C.localizeArticle(a, lang));
 
         const relatedHTML = related.length ? `
             <section class="related-section">
@@ -56,7 +59,7 @@
                 <div class="articles-grid">
                     ${related.map(r => `
                         <article class="article-card">
-                            <span class="card-category">${C.esc(r.category || 'Tech')}</span>
+                            <span class="card-category">${C.esc(C.translateCategory(r.category, lang))}</span>
                             <h3><a href="article.html?id=${encodeURIComponent(r.id)}">${C.esc(r.title)}</a></h3>
                             <p>${C.esc(r.excerpt)}</p>
                             <a href="article.html?id=${encodeURIComponent(r.id)}" class="read-more" data-i18n="read_more">${I.t('read_more')}</a>
@@ -74,10 +77,19 @@
             ? `<img src="${C.esc(article.image)}" alt="${C.esc(article.title)}" class="article-hero-img" loading="eager">`
             : '';
 
+        // Extra gallery images beyond the hero (article.images: string[])
+        const galleryImages = Array.isArray(article.images) ? article.images.filter(Boolean) : [];
+        const galleryHTML = galleryImages.length ? `
+            <div class="article-gallery">
+                ${galleryImages.map(src => `
+                    <img src="${C.esc(src)}" alt="${C.esc(article.title)}" loading="lazy" class="gallery-img">
+                `).join('')}
+            </div>` : '';
+
         $('#articleContainer').innerHTML = `
             <article class="single-article">
                 <header class="article-header">
-                    <span class="article-category">${C.esc(article.category || 'Tech')}</span>
+                    <span class="article-category">${C.esc(C.translateCategory(article.category, lang))}</span>
                     <h1>${C.esc(article.title)}</h1>
                     <div class="article-meta">
                         <span>👤 ${C.esc(article.author || 'TechPulse Team')}</span>
@@ -92,6 +104,8 @@
                 <div class="article-excerpt"><p>${C.esc(article.excerpt)}</p></div>
 
                 <div class="article-content">${contentHTML}</div>
+
+                ${galleryHTML}
 
                 <div class="share-buttons">
                     <span class="share-label" data-i18n="share_label">${I.t('share_label')}</span>
@@ -109,9 +123,20 @@
                 <div class="back-row">
                     <a href="index.html" class="btn-secondary" data-i18n="back_all">${I.t('back_all')}</a>
                 </div>
+
+                <section class="comments-section">
+                    <h2 class="section-heading" data-i18n="comments_title">${I.t('comments_title')}</h2>
+                    <div id="commentsContainer"></div>
+                </section>
             </article>
             ${relatedHTML}
         `;
+
+        C.loadDisqusThread(document.getElementById('commentsContainer'), {
+            identifier: article.id,
+            url: location.href,
+            title: article.title
+        });
 
         // Like button
         const likeBtn = $('#articleLikeBtn');
@@ -171,11 +196,12 @@
         const old = document.getElementById('article-jsonld');
         if (old) old.remove();
 
+        const lang = I.getLang();
         const data = {
             '@context': 'https://schema.org',
             '@type': 'TechArticle',
-            headline: article.title,
-            description: article.excerpt || '',
+            headline: C.pickLocalized(article.title, lang),
+            description: C.pickLocalized(article.excerpt, lang),
             datePublished: article.date || '',
             author: { '@type': 'Person', name: article.author || 'TechPulse Team' },
             image: article.image ? [new URL(article.image, location.href).href] : undefined,

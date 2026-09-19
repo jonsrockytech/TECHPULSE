@@ -68,7 +68,18 @@ window.TPI18N = (function () {
       back_all: "← Back to all articles",
       share_label: "Share:",
       related_heading: "📚 Related Articles",
-      footer_rights: "All rights reserved."
+      footer_rights: "All rights reserved.",
+
+      nav_forum: "Forum", nav_news: "News",
+      widget_news: "📡 Latest News", news_tech_label: "Technology", news_oil_label: "Oil & Gas",
+      news_updated: "Updated hourly", news_source: "Source",
+      comments_title: "💬 Comments", comments_unavailable: "Comments aren't set up on this preview yet.",
+      forum_hero_title: "TechPulse Community Forum",
+      forum_hero_desc: "Ask questions, share your projects, and discuss Technology, Petroleum, Natural Gas, and Programming with other members.",
+      forum_cat_tech: "Technology Discussions", forum_cat_petroleum: "Petroleum Discussions",
+      forum_cat_gas: "Natural Gas Discussions", forum_cat_programming: "Programming Discussions",
+      open_discussion: "Open Discussion →",
+      forum_note: "Discussions are powered by Disqus and are visible to every visitor."
     },
     zh: {
       nav_home: "首页", nav_about: "关于", nav_contact: "联系", nav_privacy: "隐私", nav_terms: "条款",
@@ -128,7 +139,18 @@ window.TPI18N = (function () {
       back_all: "← 返回所有文章",
       share_label: "分享：",
       related_heading: "📚 相关文章",
-      footer_rights: "保留所有权利。"
+      footer_rights: "保留所有权利。",
+
+      nav_forum: "论坛", nav_news: "新闻",
+      widget_news: "📡 最新消息", news_tech_label: "科技", news_oil_label: "石油和天然气",
+      news_updated: "每小时更新", news_source: "来源",
+      comments_title: "💬 评论", comments_unavailable: "此预览版尚未启用评论功能。",
+      forum_hero_title: "TechPulse 社区论坛",
+      forum_hero_desc: "提出问题、分享你的项目，并与其他成员讨论科技、石油、天然气和编程话题。",
+      forum_cat_tech: "科技讨论", forum_cat_petroleum: "石油讨论",
+      forum_cat_gas: "天然气讨论", forum_cat_programming: "编程讨论",
+      open_discussion: "打开讨论 →",
+      forum_note: "讨论由 Disqus 提供支持，所有访客均可见。"
     },
     es: {
       nav_home: "Inicio", nav_about: "Acerca de", nav_contact: "Contacto", nav_privacy: "Privacidad", nav_terms: "Términos",
@@ -188,7 +210,18 @@ window.TPI18N = (function () {
       back_all: "← Volver a todos los artículos",
       share_label: "Compartir:",
       related_heading: "📚 Artículos Relacionados",
-      footer_rights: "Todos los derechos reservados."
+      footer_rights: "Todos los derechos reservados.",
+
+      nav_forum: "Foro", nav_news: "Noticias",
+      widget_news: "📡 Últimas Noticias", news_tech_label: "Tecnología", news_oil_label: "Petróleo y Gas",
+      news_updated: "Se actualiza cada hora", news_source: "Fuente",
+      comments_title: "💬 Comentarios", comments_unavailable: "Los comentarios aún no están configurados en esta vista previa.",
+      forum_hero_title: "Foro de la Comunidad TechPulse",
+      forum_hero_desc: "Haz preguntas, comparte tus proyectos y debate sobre Tecnología, Petróleo, Gas Natural y Programación con otros miembros.",
+      forum_cat_tech: "Debates de Tecnología", forum_cat_petroleum: "Debates de Petróleo",
+      forum_cat_gas: "Debates de Gas Natural", forum_cat_programming: "Debates de Programación",
+      open_discussion: "Abrir Debate →",
+      forum_note: "Los debates funcionan con Disqus y son visibles para todos los visitantes."
     },
     hi: {
       nav_home: "होम", nav_about: "हमारे बारे में", nav_contact: "संपर्क करें", nav_privacy: "गोपनीयता", nav_terms: "शर्तें",
@@ -248,7 +281,18 @@ window.TPI18N = (function () {
       back_all: "← सभी लेखों पर वापस जाएं",
       share_label: "साझा करें:",
       related_heading: "📚 संबंधित लेख",
-      footer_rights: "सर्वाधिकार सुरक्षित।"
+      footer_rights: "सर्वाधिकार सुरक्षित।",
+
+      nav_forum: "फ़ोरम", nav_news: "समाचार",
+      widget_news: "📡 ताज़ा समाचार", news_tech_label: "तकनीक", news_oil_label: "पेट्रोलियम और गैस",
+      news_updated: "हर घंटे अपडेट होता है", news_source: "स्रोत",
+      comments_title: "💬 टिप्पणियाँ", comments_unavailable: "इस पूर्वावलोकन में टिप्पणियाँ अभी सक्षम नहीं हैं।",
+      forum_hero_title: "TechPulse सामुदायिक फ़ोरम",
+      forum_hero_desc: "सवाल पूछें, अपनी परियोजनाएँ साझा करें, और अन्य सदस्यों के साथ तकनीक, पेट्रोलियम, प्राकृतिक गैस और प्रोग्रामिंग पर चर्चा करें।",
+      forum_cat_tech: "तकनीक चर्चाएँ", forum_cat_petroleum: "पेट्रोलियम चर्चाएँ",
+      forum_cat_gas: "प्राकृतिक गैस चर्चाएँ", forum_cat_programming: "प्रोग्रामिंग चर्चाएँ",
+      open_discussion: "चर्चा खोलें →",
+      forum_note: "चर्चाएँ Disqus द्वारा संचालित हैं और सभी आगंतुकों को दिखाई देती हैं।"
     },
     fr: {
       nav_home: "Accueil", nav_about: "À propos", nav_contact: "Contact", nav_privacy: "Confidentialité", nav_terms: "Conditions",
@@ -308,7 +352,89 @@ window.TPI18N = (function () {
       back_all: "← Retour à tous les articles",
       share_label: "Partager :",
       related_heading: "📚 Articles Similaires",
-      footer_rights: "Tous droits réservés."
+      footer_rights: "Tous droits réservés.",
+
+      nav_forum: "Forum", nav_news: "Actualités",
+      widget_news: "📡 Dernières Actualités", news_tech_label: "Technologie", news_oil_label: "Pétrole et Gaz",
+      news_updated: "Mis à jour toutes les heures", news_source: "Source",
+      comments_title: "💬 Commentaires", comments_unavailable: "Les commentaires ne sont pas encore configurés sur cet aperçu.",
+      forum_hero_title: "Forum Communautaire TechPulse",
+      forum_hero_desc: "Posez vos questions, partagez vos projets et échangez sur la Technologie, le Pétrole, le Gaz Naturel et la Programmation avec les autres membres.",
+      forum_cat_tech: "Discussions Technologie", forum_cat_petroleum: "Discussions Pétrole",
+      forum_cat_gas: "Discussions Gaz Naturel", forum_cat_programming: "Discussions Programmation",
+      open_discussion: "Ouvrir la Discussion →",
+      forum_note: "Les discussions sont propulsées par Disqus et visibles par tous les visiteurs."
+    },
+    ar: {
+      nav_home: "الرئيسية", nav_about: "من نحن", nav_contact: "اتصل بنا", nav_privacy: "الخصوصية", nav_terms: "الشروط",
+      hero_title: "أنظمة مدمجة متقدمة وأدلة تقنية",
+      hero_desc: "اكتشف شروحات حصرية للأجهزة ومشاريع هندسية عملية.",
+      search_ph: "ابحث في المقالات...", loading: "جارٍ تحميل المقالات...",
+      filter_all: "الكل", no_results: "لا توجد مقالات مطابقة لبحثك.",
+      widget_trending: "🔥 الأكثر رواجاً", widget_newsletter: "📬 النشرة البريدية",
+      newsletter_desc: "ملخص أسبوعي لأفضل المقالات التقنية. بدون رسائل مزعجة.",
+      btn_subscribe: "اشترك", widget_topics: "🏷 المواضيع",
+      widget_bookmarks: "🔖 المقالات المحفوظة", no_bookmarks: "لا توجد مقالات محفوظة بعد.",
+      read_time: "دقيقة قراءة", views: "مشاهدة", read_more: "اقرأ المزيد",
+      newsletter_success: "✓ شكراً لاشتراكك!", newsletter_error: "✗ حدث خطأ ما. حاول مرة أخرى.",
+
+      about_title: "عن TechPulse",
+      about_desc: "TechPulse منصة هندسية متخصصة في الأنظمة المدمجة، المتحكمات الدقيقة، وشروحات الأجهزة.",
+
+      contact_title: "اتصل بنا",
+      contact_intro: "لديك أسئلة أو ملاحظات أو استفسارات تحريرية؟ تواصل معنا عبر النموذج أدناه أو بالبريد الإلكتروني.",
+      contact_name_ph: "الاسم الكامل",
+      contact_email_ph: "البريد الإلكتروني",
+      contact_msg_ph: "الرسالة",
+      btn_send: "إرسال الرسالة",
+      contact_success: "✓ شكراً! تم إرسال رسالتك.",
+      contact_error: "✗ حدث خطأ ما. يرجى مراسلتنا مباشرة عبر البريد الإلكتروني.",
+      contact_email_intro: "أو راسلنا مباشرة على",
+
+      privacy_title: "سياسة الخصوصية",
+      privacy_desc: "في TechPulse، خصوصية زوارنا من أهم أولوياتنا. توضح هذه السياسة أنواع المعلومات التي نجمعها وكيفية استخدامها.",
+      privacy_log_title: "ملفات السجل",
+      privacy_log_desc: "يتبع TechPulse إجراءً معيارياً لاستخدام ملفات السجل، والتي تسجل بيانات الزوار مثل عنوان IP ونوع المتصفح ومزود الإنترنت والتاريخ/الوقت والصفحات المرجعية والنقرات.",
+      privacy_cookies_title: "ملفات تعريف الارتباط (Cookies)",
+      privacy_cookies_desc: "مثل العديد من المواقع، يستخدم TechPulse ملفات تعريف الارتباط لحفظ تفضيلات الزوار وسجل تصفح الصفحات لتحسين تجربة الاستخدام.",
+      privacy_storage_title: "التخزين المحلي",
+      privacy_storage_desc: "يستخدم موقعنا خاصية localStorage في متصفحك لتذكر المظهر واللغة والمقالات المحفوظة وإحصائيات القراءة المحلية. هذه البيانات لا تغادر جهازك أبداً ويمكن مسحها من إعدادات المتصفح.",
+      privacy_third_title: "سياسات الأطراف الأخرى",
+      privacy_third_desc: "لا تنطبق سياسة خصوصية TechPulse على المعلنين أو المواقع الأخرى. يرجى الرجوع إلى سياسات كل خدمة خارجية على حدة.",
+      privacy_consent_title: "الموافقة",
+      privacy_consent_desc: "باستخدامك لموقعنا، فإنك توافق على سياسة الخصوصية الخاصة بنا وشروطها.",
+
+      terms_title: "شروط الاستخدام",
+      terms_desc: "بدخولك إلى هذا الموقع، فإنك تقبل هذه الشروط والأحكام بالكامل. يرجى عدم الاستمرار في استخدام TechPulse إذا لم تكن توافق على جميع الشروط المذكورة في هذه الصفحة.",
+      terms_ip_title: "حقوق الملكية الفكرية",
+      terms_ip_desc: "ما لم يُذكر خلاف ذلك، يمتلك TechPulse حقوق الملكية الفكرية لجميع المحتويات في هذا الموقع. يمكنك عرض أو طباعة الصفحات للاستخدام الشخصي وفق القيود المحددة في هذه الشروط.",
+      terms_content_title: "محتوى المستخدم",
+      terms_content_desc: "يجب أن تكون أي ملاحظات تقدمها محترمة وقانونية وخالية من الرسائل المزعجة أو المحتوى المسيء. المحتوى المخزن محلياً لا يغادر جهازك أبداً.",
+      terms_disclaimer_title: "إخلاء المسؤولية",
+      terms_disclaimer_desc: "المعلومات الموجودة على TechPulse هي لأغراض تعليمية وإعلامية فقط. نحن لا نقدم أي ضمانات بشأن اكتمال هذه المعلومات أو موثوقيتها أو دقتها.",
+      terms_changes_title: "التعديلات",
+      terms_changes_desc: "يجوز لنا تحديث هذه الشروط في أي وقت. استمرارك في استخدام الموقع يعني قبولك للشروط الجديدة.",
+
+      breadcrumb_articles: "المقالات",
+      article_loading: "جارٍ تحميل المقال...",
+      not_found_title: "المقال غير موجود",
+      not_found_desc: "المقال الذي تبحث عنه غير موجود أو تم حذفه.",
+      back_home: "→ العودة إلى الرئيسية",
+      back_all: "→ العودة إلى جميع المقالات",
+      share_label: "مشاركة:",
+      related_heading: "📚 مقالات ذات صلة",
+      footer_rights: "جميع الحقوق محفوظة.",
+
+      nav_forum: "المنتدى", nav_news: "الأخبار",
+      widget_news: "📡 آخر الأخبار", news_tech_label: "التكنولوجيا", news_oil_label: "البترول والغاز",
+      news_updated: "يتحدّث كل ساعة", news_source: "المصدر",
+      comments_title: "💬 التعليقات", comments_unavailable: "التعليقات غير مُفعّلة بعد في هذه النسخة.",
+      forum_hero_title: "منتدى TechPulse للنقاش",
+      forum_hero_desc: "اطرح أسئلتك، شارك مشاريعك، وناقش مواضيع التكنولوجيا والبترول والغاز والبرمجة مع بقية الأعضاء.",
+      forum_cat_tech: "نقاشات التكنولوجيا", forum_cat_petroleum: "نقاشات البترول",
+      forum_cat_gas: "نقاشات الغاز الطبيعي", forum_cat_programming: "نقاشات البرمجة",
+      open_discussion: "فتح النقاش ←",
+      forum_note: "النقاشات مدعومة بخدمة Disqus وهي مرئية لجميع الزوار."
     }
   };
 
@@ -325,6 +451,7 @@ window.TPI18N = (function () {
     if (lang) currentLang = lang;
     const dict = translations[currentLang] || translations.en;
     document.documentElement.setAttribute('lang', currentLang);
+    document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
