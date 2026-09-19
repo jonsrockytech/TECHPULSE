@@ -846,6 +846,125 @@ html.dark-theme .btn-delete { background: rgba(220, 38, 38, 0.15); color: #f8717
     .breadcrumbs .current { max-width: 160px; }
 }
 
+/* ============ Language selector (shared across every page) ============ */
+.lang-select {
+    background: var(--bg-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+}
+
+/* ============ Reading progress bar (top of viewport) ============ */
+#readingProgressBar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--primary);
+    width: 0%;
+    z-index: 10000;
+    transition: width 0.1s ease-out;
+}
+
+/* ============ Bookmark + Like buttons ============ */
+.bookmark-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    padding: 0 2px;
+    transition: transform 0.2s;
+}
+.bookmark-btn:hover { transform: scale(1.15); }
+
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition);
+}
+.like-btn:hover { border-color: var(--primary); }
+.like-btn.liked { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.like-count { font-variant-numeric: tabular-nums; }
+
+/* ============ Admin access modal (injected by common.js on every page) ============ */
+.admin-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+.admin-modal-overlay.active { display: flex; }
+.admin-modal-card {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    border: 1px solid #334155;
+    font-family: inherit;
+}
+.admin-modal-card h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.25rem; }
+.admin-modal-card input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #fff;
+    box-sizing: border-box;
+    outline: none;
+}
+.admin-modal-card button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+.admin-modal-card button:hover { background: #1d4ed8; }
+
+/* ============ Code block copy button ============ */
+pre { position: relative; }
+.copy-code-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #334155;
+    color: #ffffff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.copy-code-btn:hover { background: #475569; }
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
