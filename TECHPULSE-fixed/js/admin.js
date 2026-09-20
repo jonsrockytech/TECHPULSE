@@ -16,7 +16,9 @@
        The published data/articles.json (bundled with the site) is always
        the baseline. Anything saved here is layered on top in this browser's
        localStorage until you hit "Export ZIP" and redeploy — this lets you
-       proof changes before they go live, same as before. */
+       proof changes before they go live. If data/meta.json's version moves
+       on, a stale local draft from an older deployment is dropped
+       automatically instead of silently hiding new published articles. */
     let articlesCache = [];
 
     async function loadArticles() {
@@ -29,6 +31,7 @@
     function saveArticles(list) {
         articlesCache = list;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        C.getArticlesVersion().then(v => { if (v) localStorage.setItem('tp_articles_version', v); });
     }
 
     function toast(msg) { window.showToast && window.showToast(msg); }
@@ -61,40 +64,6 @@
 
     let currentImageData = '';
     let currentGalleryImages = []; // array of data URLs / paths
-
-    /* ---------- Bilingual field tabs (title / excerpt / content) ----------
-       Each of these three fields is stored as {en, ar}. The visible inputs
-       always show one language at a time; switching tabs stashes the
-       current values into the draft object first. */
-    let adminLang = 'en';
-    let i18nDraft = { title: { en: '', ar: '' }, excerpt: { en: '', ar: '' }, content: { en: '', ar: '' } };
-
-    function stashCurrentLangInputs() {
-        i18nDraft.title[adminLang] = titleInput.value;
-        i18nDraft.excerpt[adminLang] = excerptInput.value;
-        i18nDraft.content[adminLang] = contentInput.value;
-    }
-    function loadLangIntoInputs(lang) {
-        titleInput.value = i18nDraft.title[lang] || '';
-        excerptInput.value = i18nDraft.excerpt[lang] || '';
-        contentInput.value = i18nDraft.content[lang] || '';
-    }
-    $$('.lang-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            const next = tab.dataset.adminlang;
-            if (next === adminLang) return;
-            stashCurrentLangInputs();
-            adminLang = next;
-            $$('.lang-tab').forEach(t => t.classList.toggle('active', t === tab));
-            loadLangIntoInputs(adminLang);
-        });
-    });
-
-    function resetI18nDraft() {
-        i18nDraft = { title: { en: '', ar: '' }, excerpt: { en: '', ar: '' }, content: { en: '', ar: '' } };
-        adminLang = 'en';
-        $$('.lang-tab').forEach(t => t.classList.toggle('active', t.dataset.adminlang === 'en'));
-    }
 
     /* ---------- Featured image upload ---------- */
     imagePreview.addEventListener('click', () => imageInput.click());
@@ -192,11 +161,10 @@
         listContainer.innerHTML = articles.map(art => {
             const title = C.pickLocalized(art.title, 'en');
             const excerpt = C.pickLocalized(art.excerpt, 'en');
-            const hasAr = art.title && art.title.ar;
             return `
             <div class="admin-article-item">
                 <div>
-                    <h4>${esc(title)} ${hasAr ? '<span title="Has Arabic translation">🇩🇿</span>' : ''}</h4>
+                    <h4>${esc(title)}</h4>
                     <p>${esc(excerpt)}</p>
                     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">
                         ${esc(art.category || '—')} · ${esc(art.date || '')} · ${art.featured ? '★ Featured' : ''}
@@ -214,22 +182,21 @@
     /* ---------- Form submit ---------- */
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        stashCurrentLangInputs();
 
         const articles = getArticles();
         const id = articleIdInput.value || Date.now().toString();
-        const title = i18nDraft.title;
-        const excerpt = i18nDraft.excerpt;
-        const content = i18nDraft.content;
+        const title = titleInput.value.trim();
+        const excerpt = excerptInput.value.trim();
+        const content = contentInput.value.trim();
         const category = categoryInput.value;
         const author = authorInput.value.trim() || 'TechPulse Team';
         const date = dateInput.value || new Date().toISOString().slice(0, 10);
-        const readTime = readTimeInput.value.trim() || calcReadTime(content.en);
+        const readTime = readTimeInput.value.trim() || calcReadTime(content);
         const tags = tagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
         const featured = featuredInput.checked;
 
-        if (!title.en || !excerpt.en || !content.en || !category) {
-            toast('Please fill all required fields (English is the minimum required language)');
+        if (!title || !excerpt || !content || !category) {
+            toast('Please fill all required fields');
             return;
         }
 
@@ -239,7 +206,7 @@
             image: currentImageData || '',
             images: currentGalleryImages.slice(),
             likes: 0,
-            slug: slugInput.value.trim() || slugify(title.en)
+            slug: slugInput.value.trim() || slugify(title)
         };
 
         const idx = articles.findIndex(a => a.id === id);
@@ -269,23 +236,16 @@
         if (delBtn) deleteArticle(delBtn.dataset.delete);
     });
 
-    function asLangMap(field) {
-        // Normalizes a legacy plain-string field into {en, ar} for editing.
-        if (field && typeof field === 'object') return { en: field.en || '', ar: field.ar || '' };
-        return { en: field || '', ar: '' };
-    }
-
     function editArticle(id) {
         const art = getArticles().find(a => a.id === id);
         if (!art) return;
         articleIdInput.value = art.id;
 
-        i18nDraft.title = asLangMap(art.title);
-        i18nDraft.excerpt = asLangMap(art.excerpt);
-        i18nDraft.content = asLangMap(art.content);
-        adminLang = 'en';
-        $$('.lang-tab').forEach(t => t.classList.toggle('active', t.dataset.adminlang === 'en'));
-        loadLangIntoInputs('en');
+        // art.title/excerpt/content may still be {en:"..."} objects left over
+        // from an earlier multi-language version — pickLocalized reads either.
+        titleInput.value = C.pickLocalized(art.title, 'en');
+        excerptInput.value = C.pickLocalized(art.excerpt, 'en');
+        contentInput.value = C.pickLocalized(art.content, 'en');
 
         slugInput.value = art.slug || '';
         slugEdited = true;
@@ -325,8 +285,6 @@
         form.reset();
         articleIdInput.value = '';
         slugEdited = false;
-        resetI18nDraft();
-        loadLangIntoInputs('en');
         currentImageData = '';
         imagePreview.innerHTML = '<span class="image-hint">Click to upload an image (max 2 MB)</span>';
         removeImageBtn.style.display = 'none';
@@ -388,7 +346,7 @@
             a.click();
             a.remove();
             URL.revokeObjectURL(url);
-            toast('📦 ZIP exported — replace data/articles.json (and assets/images/) on your live site with the contents of this ZIP to publish.');
+            toast('📦 ZIP exported — replace data/articles.json (and assets/images/) on your live site with the contents of this ZIP to publish. Remember to bump the version in data/meta.json too.');
         });
     }
 

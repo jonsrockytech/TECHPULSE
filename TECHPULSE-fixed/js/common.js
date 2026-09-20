@@ -7,7 +7,7 @@
 window.TPCommon = (function () {
   'use strict';
 
-  const LOCALE_MAP = { en: 'en-US', zh: 'zh-CN', es: 'es-ES', hi: 'hi-IN', fr: 'fr-FR', ar: 'ar-DZ' };
+  const LOCALE_MAP = { en: 'en-US', zh: 'zh-CN', es: 'es-ES', hi: 'hi-IN', fr: 'fr-FR' };
 
   function esc(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({
@@ -66,7 +66,14 @@ window.TPCommon = (function () {
      data/articles.json is the published source every visitor sees.
      A local admin preview (saved by admin.html into localStorage) overrides
      it in the browser that made the edit, so the author can proof changes
-     before exporting/publishing the ZIP. */
+     before exporting/publishing the ZIP.
+
+     data/meta.json carries a version stamp for the published set. If it
+     changed since the last time THIS browser saved a local override, the
+     override is stale (left over from testing an older deployment) and is
+     dropped automatically — otherwise a forgotten local draft could hide
+     brand new published articles indefinitely, in the one browser that
+     happens to have used the admin panel before. */
   let cache = null;
   async function getArticles(force) {
     if (cache && !force) return cache;
@@ -80,12 +87,36 @@ window.TPCommon = (function () {
     } catch (err) {
       console.warn('Could not load data/articles.json', err);
     }
+
+    let currentVersion = '';
+    try {
+      const metaRes = await fetch('data/meta.json', { cache: 'no-store' });
+      if (metaRes.ok) currentVersion = (await metaRes.json()).articlesVersion || '';
+    } catch { /* no meta.json — skip the staleness check */ }
+
+    const savedVersion = localStorage.getItem('tp_articles_version') || '';
+    if (currentVersion && savedVersion !== currentVersion) {
+      // Published content moved on since this override was saved — drop it.
+      localStorage.removeItem('tp_articles');
+      localStorage.setItem('tp_articles_version', currentVersion);
+    }
+
     try {
       const local = JSON.parse(localStorage.getItem('tp_articles'));
       if (Array.isArray(local) && local.length) { cache = local; return local; }
     } catch { /* ignore malformed local override */ }
     cache = published;
     return published;
+  }
+
+  let cachedVersion = null;
+  async function getArticlesVersion() {
+    if (cachedVersion !== null) return cachedVersion;
+    try {
+      const res = await fetch('data/meta.json', { cache: 'no-store' });
+      cachedVersion = res.ok ? ((await res.json()).articlesVersion || '') : '';
+    } catch { cachedVersion = ''; }
+    return cachedVersion;
   }
 
   /* ---------- View counts ----------
@@ -328,10 +359,10 @@ window.TPCommon = (function () {
      filtering/matching never breaks across languages; only the on-screen
      label is translated. */
   const CATEGORY_LABELS = {
-    Technology:  { en: 'Technology',  zh: '科技',   es: 'Tecnología',   hi: 'तकनीक',        fr: 'Technologie',   ar: 'التكنولوجيا' },
-    Petroleum:   { en: 'Petroleum',   zh: '石油',   es: 'Petróleo',     hi: 'पेट्रोलियम',    fr: 'Pétrole',       ar: 'البترول' },
-    Gas:         { en: 'Natural Gas', zh: '天然气', es: 'Gas Natural',  hi: 'प्राकृतिक गैस', fr: 'Gaz Naturel',   ar: 'الغاز الطبيعي' },
-    Programming: { en: 'Programming', zh: '编程',   es: 'Programación', hi: 'प्रोग्रामिंग',  fr: 'Programmation', ar: 'البرمجة' }
+    Technology:  { en: 'Technology',  zh: '科技',   es: 'Tecnología',   hi: 'तकनीक',        fr: 'Technologie' },
+    Petroleum:   { en: 'Petroleum',   zh: '石油',   es: 'Petróleo',     hi: 'पेट्रोलियम',    fr: 'Pétrole' },
+    Gas:         { en: 'Natural Gas', zh: '天然气', es: 'Gas Natural',  hi: 'प्राकृतिक गैस', fr: 'Gaz Naturel' },
+    Programming: { en: 'Programming', zh: '编程',   es: 'Programación', hi: 'प्रोग्रामिंग',  fr: 'Programmation' }
   };
   function translateCategory(category, lang) {
     const entry = CATEGORY_LABELS[category];
@@ -342,7 +373,7 @@ window.TPCommon = (function () {
   return {
     esc, slugify, formatDate, calcReadMinutes,
     pickLocalized, localizeArticle, translateCategory,
-    getArticles,
+    getArticles, getArticlesVersion,
     getViews, registerView,
     getLikeCount, hasLiked, toggleLike,
     getBookmarks, isBookmarked, toggleBookmark,

@@ -31,6 +31,8 @@
     renderBookmarksList();
     renderNewsWidget();
     if (document.getElementById('articles-container')) {
+      renderSiteStats();
+      renderFeatured();
       renderFilters();
       renderArticlesUI();
       renderTrending();
@@ -159,11 +161,36 @@
     // matching how a real "articles listing" page is usually counted.
     allArticles.forEach(a => C.registerView(a.id));
 
+    renderSiteStats();
+    renderFeatured();
     renderFilters();
     renderTags();
     renderArticlesUI();
     renderTrending();
     wireSearch();
+  }
+
+  function renderSiteStats() {
+    const box = document.getElementById('siteStatsBar');
+    if (!box) return;
+    const lang = I.getLang();
+    const cats = categoriesOf(allArticles).length;
+    box.innerHTML = `
+      <div class="stat-block"><span class="stat-num">${allArticles.length}</span><span class="stat-label">${C.esc(I.t('stats_articles'))}</span></div>
+      <div class="stat-block"><span class="stat-num">${cats}</span><span class="stat-label">${C.esc(I.t('stats_categories'))}</span></div>
+    `;
+  }
+
+  function renderFeatured() {
+    const section = document.getElementById('featuredSection');
+    const box = document.getElementById('featuredSpotlight');
+    if (!section || !box) return;
+    const lang = I.getLang();
+    const featured = allArticles.filter(a => a.featured).slice(0, 3);
+    if (!featured.length) { section.style.display = 'none'; return; }
+    section.style.display = '';
+    box.innerHTML = featured.map(a => renderCard(C.localizeArticle(a, lang), lang)).join('');
+    wireCardInteractions(box);
   }
 
   function categoriesOf(articles) {
