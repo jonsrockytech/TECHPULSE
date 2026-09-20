@@ -312,7 +312,7 @@ window.TPCommon = (function () {
      needs no backend: create a site at https://disqus.com/admin/create/
      (about 2 minutes) and paste the "shortname" it gives you below. Until
      then, a friendly placeholder is shown instead of a broken widget. */
-  const DISQUS_SHORTNAME = ''; // <-- paste your Disqus shortname here (see comments above)
+  const DISQUS_SHORTNAME = 'techpulse-2'; // <-- paste your Disqus shortname here (see comments above)
 
   function disqusUnavailableHTML() {
     const msg = window.TPI18N ? window.TPI18N.t('comments_unavailable') : "Comments aren't set up on this preview yet.";
