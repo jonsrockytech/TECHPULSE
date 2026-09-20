@@ -230,19 +230,6 @@
 .image-hint { color: var(--text-muted); font-size: 0.88rem; }
 .image-preview.has-image .image-hint { display: none; }
 
-/* Language tabs for translatable fields (title/excerpt/content) */
-.lang-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
-.lang-tab {
-    padding: 6px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--bg-alt);
-    color: var(--text);
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-.lang-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-
 /* Gallery image strip */
 .gallery-strip {
     display: flex;

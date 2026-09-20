@@ -1038,19 +1038,53 @@ pre { position: relative; }
     margin-inline-end: 6px;
 }
 
-/* ============ RTL (Arabic) support ============
-   Most spacing already uses flex/grid which mirrors automatically with
-   dir="rtl"; these are the few spots that need an explicit override. */
-html[dir="rtl"] { text-align: right; }
-html[dir="rtl"] .ticker-track { animation-direction: reverse; }
-html[dir="rtl"] .back-row,
-html[dir="rtl"] .breadcrumbs { flex-direction: row-reverse; }
-html[dir="rtl"] .card-meta,
-html[dir="rtl"] .share-buttons,
-html[dir="rtl"] .nav-links { flex-wrap: wrap; }
-html[dir="rtl"] .popular-list { padding-inline-start: 0; }
-html[dir="rtl"] .filter-chip,
-html[dir="rtl"] .tag { direction: rtl; }
+/* ============ News page (news.html) ============ */
+.news-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 20px 0 40px;
+}
+.news-columns .widget { margin: 0; }
+.news-columns .news-widget-item { padding: 10px 0; font-size: 0.92rem; }
+
+/* ============ Featured spotlight (homepage) ============ */
+.featured-spotlight {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin: 24px 0 36px;
+}
+.featured-spotlight .article-card {
+    border: 1px solid var(--primary);
+    background: linear-gradient(180deg, var(--primary-soft), var(--bg-alt) 60%);
+}
+.site-stats-bar {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 18px 0 6px;
+}
+.site-stats-bar .stat-block { text-align: center; }
+.site-stats-bar .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--primary); display: block; }
+.site-stats-bar .stat-label { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ============ Forum discussion starters ============ */
+.forum-starters {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: none;
+}
+.forum-starters.active { display: block; }
+.forum-starters h4 { margin: 0 0 8px; font-size: 0.95rem; }
+.forum-starters ul { margin: 0; padding-inline-start: 20px; font-size: 0.88rem; color: var(--text-muted); }
+.forum-starters li { margin-bottom: 4px; }
+.forum-cat-desc { font-size: 0.82rem; color: var(--text-muted); margin: -8px 0 16px; text-align: center; display: none; }
+.forum-cat-desc.active { display: block; }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
