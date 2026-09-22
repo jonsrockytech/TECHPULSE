@@ -256,7 +256,7 @@
   <script src="js/common.js?v=20260922_v6"></script>
   <script src="js/admin.js?v=20260922_v6"></script>
 
-  <!-- Script for AI Generation (Latest Models) -->
+  <!-- Script for AI Generation (Latest Gemini 3 Models) -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const apiKeyInput = document.getElementById("ai-api-key");
@@ -315,11 +315,16 @@ Return ONLY a raw JSON object matching this structure (no markdown fences, no \`
 }
 Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "Programming". Choose the best fit based on images.`;
 
+          // ============================================================
+          // أحدث نماذج Gemini المستقرة (سبتمبر 2026)
+          // المرجع: https://ai.google.dev/gemini-api/docs/models
+          // ============================================================
           const candidateModels = [
-            "gemini-5.0-flash",
-            "gemini-4.5-flash",
-            "gemini-4.0-flash",
-            "gemini-3.6-flash"
+            "gemini-3.8-flash",
+            "gemini-3.7-flash",
+            "gemini-3.6-flash",
+            "gemini-3.5-flash",
+            "gemini-3.0-flash"
           ];
 
           let responseData = null;
@@ -343,12 +348,15 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
               const data = await res.json();
               if (data.candidates && data.candidates[0]) {
                 responseData = data;
+                statusDiv.innerText = `✅ Model ${model} responded.`;
                 break;
               } else if (data.error) {
                 lastError = data.error.message;
+                console.warn(`Model ${model} failed:`, data.error.message);
               }
             } catch (err) {
               lastError = err.message;
+              console.warn(`Model ${model} threw:`, err.message);
             }
           }
 
