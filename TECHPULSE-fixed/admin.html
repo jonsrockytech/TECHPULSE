@@ -6,7 +6,7 @@
   <title>TechPulse | Article Manager</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="css/style.css?v=20260922">
+  <link rel="stylesheet" href="css/style.css?v=20260922_v4">
   <style>
     .ai-generator-card {
       background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -253,8 +253,8 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="js/common.js?v=20260922"></script>
-  <script src="js/admin.js?v=20260922"></script>
+  <script src="js/common.js?v=20260922_v4"></script>
+  <script src="js/admin.js?v=20260922_v4"></script>
 
   <!-- AI Generator Script -->
   <script>
@@ -298,7 +298,7 @@
         localStorage.setItem("tp_gemini_key", apiKey);
         generateBtn.disabled = true;
         statusDiv.style.color = "#38bdf8";
-        statusDiv.innerText = "⏳ Processing images and generating article...";
+        statusDiv.innerText = "⏳ Connecting to Gemini 3.6 Flash...";
 
         try {
           const imageParts = await Promise.all(files.map(f => fileToBase64(f)));
@@ -317,7 +317,8 @@ Return ONLY a raw JSON object matching this structure (no markdown fences, no \`
 }
 Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "Programming". Choose the best fit based on images.`;
 
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          // استخدام النموذج المطلوبة المحدث gemini-3.6-flash
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
