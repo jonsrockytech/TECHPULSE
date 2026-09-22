@@ -329,7 +329,11 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
 
           for (const model of candidateModels) {
             try {
-              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+             const candidateModels = [
+  "gemini-flash-latest",   // alias يأشر دايما على أحدث فلاش مستقر (حاليا gemini-3.6-flash)
+  "gemini-2.5-flash",      // احتياطي، لازال يخدم حتى أكتوبر 2026
+  "gemini-3.1-flash-lite"  // خفيف وسريع كبديل تاني
+];
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
