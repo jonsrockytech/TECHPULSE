@@ -1,13 +1,14 @@
 /* ==========================================================================
-   TechPulse — Shared Utilities (common.js)
-   Loaded on every page BEFORE i18n.js / main.js / article.js.
-   Centralizes logic that used to be duplicated (or missing) across pages:
-   escaping, dates, article loading, views, likes, bookmarks, admin gate.
+   TechPulse — Shared Utilities (common.js) - Updated with Supabase API
    ========================================================================== */
 window.TPCommon = (function () {
   'use strict';
 
   const LOCALE_MAP = { en: 'en-US', zh: 'zh-CN', es: 'es-ES', hi: 'hi-IN', fr: 'fr-FR' };
+
+  // إعدادات اتصال Supabase (قم بتغييرها بمعلومات مشروعك الفعلي)
+  const SUPABASE_URL = 'https://ijgvrjkpiofamwcmkmgi.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_5NcPMPDtyNXRg-oduydRUA_JM6IeV9k';
 
   function esc(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({
@@ -37,11 +38,6 @@ window.TPCommon = (function () {
     return Math.max(1, Math.round(words / 200));
   }
 
-  /* ---------- Multi-language article fields ----------
-     title/excerpt/content may be either a plain string (legacy / not yet
-     translated) or an object like {en:"...", ar:"..."}. pickLocalized()
-     resolves either shape to a single string for the active language,
-     falling back to English, then to whatever language IS available. */
   function pickLocalized(field, lang) {
     if (field == null) return '';
     if (typeof field === 'string') return field;
@@ -62,22 +58,32 @@ window.TPCommon = (function () {
     });
   }
 
-  /* ---------- Article data ----------
-     data/articles.json is the published source every visitor sees.
-     A local admin preview (saved by admin.html into localStorage) overrides
-     it in the browser that made the edit, so the author can proof changes
-     before exporting/publishing the ZIP.
-
-     data/meta.json carries a version stamp for the published set. If it
-     changed since the last time THIS browser saved a local override, the
-     override is stale (left over from testing an older deployment) and is
-     dropped automatically — otherwise a forgotten local draft could hide
-     brand new published articles indefinitely, in the one browser that
-     happens to have used the admin panel before. */
+  /* ---------- Article data from Supabase API ---------- */
   let cache = null;
   async function getArticles(force) {
     if (cache && !force) return cache;
     let published = [];
+
+    // 1. محاولة الجلب مباشرة من Supabase API
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=*&order=date.desc`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json) && json.length > 0) {
+          cache = json;
+          return json;
+        }
+      }
+    } catch (err) {
+      console.warn('Could not load from Supabase, falling back to local/static data', err);
+    }
+
+    // 2. البديل الاحتياطي (الملف الثابت) في حال عدم توفر اتصال
     try {
       const res = await fetch('data/articles.json', { cache: 'no-store' });
       if (res.ok) {
@@ -88,23 +94,6 @@ window.TPCommon = (function () {
       console.warn('Could not load data/articles.json', err);
     }
 
-    let currentVersion = '';
-    try {
-      const metaRes = await fetch('data/meta.json', { cache: 'no-store' });
-      if (metaRes.ok) currentVersion = (await metaRes.json()).articlesVersion || '';
-    } catch { /* no meta.json — skip the staleness check */ }
-
-    const savedVersion = localStorage.getItem('tp_articles_version') || '';
-    if (currentVersion && savedVersion !== currentVersion) {
-      // Published content moved on since this override was saved — drop it.
-      localStorage.removeItem('tp_articles');
-      localStorage.setItem('tp_articles_version', currentVersion);
-    }
-
-    try {
-      const local = JSON.parse(localStorage.getItem('tp_articles'));
-      if (Array.isArray(local) && local.length) { cache = local; return local; }
-    } catch { /* ignore malformed local override */ }
     cache = published;
     return published;
   }
@@ -119,11 +108,7 @@ window.TPCommon = (function () {
     return cachedVersion;
   }
 
-  /* ---------- View counts ----------
-     Static site, no backend: counts live in the visitor's own browser
-     (same rule already stated in the Privacy Policy for locally stored data).
-     A real count, starting at 0 — no randomly-seeded fake numbers — and
-     de-duplicated per browser tab session so refreshing doesn't inflate it. */
+  /* ---------- View counts ---------- */
   function getViews(id) {
     return parseInt(localStorage.getItem('tp_views_' + id) || '0', 10);
   }
@@ -136,7 +121,7 @@ window.TPCommon = (function () {
     return v;
   }
 
-  /* ---------- Likes (reader interaction) ---------- */
+  /* ---------- Likes ---------- */
   function readLikeMap() {
     try { return JSON.parse(localStorage.getItem('tp_likes') || '{}'); } catch { return {}; }
   }
@@ -177,7 +162,7 @@ window.TPCommon = (function () {
     return bookmarks;
   }
 
-  /* ---------- Toast (shared with admin.js) ---------- */
+  /* ---------- Toast ---------- */
   let toastEl, toastTimer;
   function showToast(msg) {
     if (!toastEl) {
@@ -192,9 +177,7 @@ window.TPCommon = (function () {
   }
   if (!window.showToast) window.showToast = showToast;
 
-  /* ---------- Dark mode (shared across every page) ----------
-     Applied to <html>, matching the CSS (`html.dark-theme { ... }`),
-     persisted, and defaults to the OS preference on first visit. */
+  /* ---------- Dark mode ---------- */
   function initDarkMode() {
     const root = document.documentElement;
     const btn = document.getElementById('darkModeToggle');
@@ -218,13 +201,7 @@ window.TPCommon = (function () {
     }
   }
 
-  /* ---------- Admin access gate ----------
-     The "Admin" link is hidden from every visitor by default on every page.
-     Ctrl+Shift+A reveals a PIN prompt; on success the link is shown for the
-     rest of the browser session and the visitor is sent to admin.html,
-     which enforces its own, separate SHA-256 password check regardless of
-     how it was reached. This PIN only avoids advertising the panel in the
-     nav — it is not a replacement for that real password gate. */
+  /* ---------- Admin access gate ---------- */
   const ADMIN_PIN = '123456';
   function ensureAdminModal() {
     if (document.getElementById('adminModal')) return;
@@ -275,10 +252,7 @@ window.TPCommon = (function () {
     });
   }
 
-  /* ---------- News ticker (index/about/contact/article/privacy/terms) ----------
-     Pulls from js/live-news.js (real Hacker News tech feed, hourly refresh,
-     curated fallback) when available, otherwise falls back to a single
-     load of data/news.json so the ticker never breaks. */
+  /* ---------- News ticker ---------- */
   let tickerData = [];
   function initTicker() {
     const track = document.getElementById('tickerTrack');
@@ -306,13 +280,8 @@ window.TPCommon = (function () {
     }
   }
 
-  /* ---------- Comments & Forum threads (Disqus) ----------
-     A static site (no server/database) cannot host comments that every
-     visitor can see — only a real hosted service can. Disqus is free and
-     needs no backend: create a site at https://disqus.com/admin/create/
-     (about 2 minutes) and paste the "shortname" it gives you below. Until
-     then, a friendly placeholder is shown instead of a broken widget. */
-  const DISQUS_SHORTNAME = 'techpulse-2'; // <-- paste your Disqus shortname here (see comments above)
+  /* ---------- Comments (Disqus) ---------- */
+  const DISQUS_SHORTNAME = 'techpulse-2';
 
   function disqusUnavailableHTML() {
     const msg = window.TPI18N ? window.TPI18N.t('comments_unavailable') : "Comments aren't set up on this preview yet.";
@@ -354,10 +323,7 @@ window.TPCommon = (function () {
 
   function hasComments() { return !!DISQUS_SHORTNAME; }
 
-  /* ---------- Category labels (Technology / Petroleum / Gas / Programming) ----------
-     The raw `category` field on an article stays a fixed English key so
-     filtering/matching never breaks across languages; only the on-screen
-     label is translated. */
+  /* ---------- Category labels ---------- */
   const CATEGORY_LABELS = {
     Technology:  { en: 'Technology',  zh: '科技',   es: 'Tecnología',   hi: 'तकनीक',        fr: 'Technologie' },
     Petroleum:   { en: 'Petroleum',   zh: '石油',   es: 'Petróleo',     hi: 'पेट्रोलियम',    fr: 'Pétrole' },
