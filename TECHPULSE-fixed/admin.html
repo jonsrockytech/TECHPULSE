@@ -126,16 +126,16 @@
   <main class="container">
     <div id="adminStats" class="admin-stats" style="margin-top:24px"></div>
 
-    <!-- AI Auto Generator Card -->
+    <!-- AI Auto Generator Card — DeepSeek -->
     <section class="ai-generator-card">
-      <h3>✨ AI Auto-Article Generator from Images</h3>
+      <h3>✨ AI Auto-Article Generator from Images (DeepSeek)</h3>
       <p style="font-size:0.88rem; color:#94a3b8; margin-bottom:16px;">
-        Upload 3 or more images. Gemini AI will analyze them and generate a complete English technical article, title, summary, and tags into the form below.
+        Upload 3 or more images. DeepSeek AI will analyze them and generate a complete English technical article, title, summary, and tags into the form below.
       </p>
       
       <div class="ai-input-group">
-        <label for="ai-api-key">Gemini API Key (Required):</label>
-        <input type="text" id="ai-api-key" placeholder="AIzaSy..." />
+        <label for="ai-api-key">DeepSeek API Key (Required):</label>
+        <input type="text" id="ai-api-key" placeholder="sk-..." />
       </div>
 
       <div class="ai-input-group">
@@ -256,7 +256,7 @@
   <script src="js/common.js?v=20260922_v6"></script>
   <script src="js/admin.js?v=20260922_v6"></script>
 
-  <!-- Script for AI Generation (Latest Gemini 3 Models) -->
+  <!-- Script for AI Generation — DeepSeek Vision -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const apiKeyInput = document.getElementById("ai-api-key");
@@ -264,19 +264,18 @@
       const generateBtn = document.getElementById("ai-generate-btn");
       const statusDiv = document.getElementById("ai-status");
 
-      const savedKey = localStorage.getItem("tp_gemini_key");
+      const savedKey = localStorage.getItem("tp_deepseek_key");
       if (savedKey) apiKeyInput.value = savedKey;
 
-      function fileToBase64(file) {
+      /**
+       * يحوّل ملف الصورة إلى data URL بصيغة base64
+       * DeepSeek يستخدم نفس تنسيق OpenAI: { type: "image_url", image_url: { url: "data:image/..." } }
+       */
+      function fileToDataUrl(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(file);
-          reader.onload = () => resolve({
-            inlineData: {
-              data: reader.result.split(',')[1],
-              mimeType: file.type
-            }
-          });
+          reader.onload = () => resolve(reader.result);
           reader.onerror = error => reject(error);
         });
       }
@@ -286,7 +285,7 @@
         const files = Array.from(imagesInput.files);
 
         if (!apiKey) {
-          alert("Please enter your Gemini API Key.");
+          alert("Please enter your DeepSeek API Key.");
           return;
         }
 
@@ -295,11 +294,12 @@
           return;
         }
 
-        localStorage.setItem("tp_gemini_key", apiKey);
+        localStorage.setItem("tp_deepseek_key", apiKey);
         generateBtn.disabled = true;
 
         try {
-          const imageParts = await Promise.all(files.map(f => fileToBase64(f)));
+          // تحويل كل الصور إلى data URLs
+          const imageDataUrls = await Promise.all(files.map(f => fileToDataUrl(f)));
 
           const promptText = `Analyze these ${files.length} images for a hardware/technical publication called TechPulse.
 Generate a comprehensive, cohesive technical article in English that connects the topics, components, or systems shown in all images.
@@ -307,7 +307,7 @@ Generate a comprehensive, cohesive technical article in English that connects th
 Return ONLY a raw JSON object matching this structure (no markdown fences, no \`\`\`json):
 {
   "title": "A captivating technical article title in English",
-  "category": "Technology", 
+  "category": "Technology",
   "excerpt": "A concise 2-sentence summary of the article",
   "tags": "tag1, tag2, tag3",
   "readTime": "5 min",
@@ -315,59 +315,53 @@ Return ONLY a raw JSON object matching this structure (no markdown fences, no \`
 }
 Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "Programming". Choose the best fit based on images.`;
 
+          // بناء مصفوفة المحتوى: أولاً جميع الصور ثم النص
+          const contentParts = imageDataUrls.map(url => ({
+            type: "image_url",
+            image_url: { url: url }
+          }));
+          contentParts.push({ type: "text", text: promptText });
+
           // ============================================================
-          // أحدث نماذج Gemini المستقرة (سبتمبر 2026)
-          // المرجع: https://ai.google.dev/gemini-api/docs/models
+          // DeepSeek API — متوافق مع تنسيق OpenAI
+          // النموذج: deepseek-v4-flash-vision-exp (يدعم الصور + النص)
+          // المرجع: https://api-docs.deepseek.com
           // ============================================================
-          const candidateModels = [
-            "gemini-3.8-flash",
-            "gemini-3.7-flash",
-            "gemini-3.6-flash",
-            "gemini-3.5-flash",
-            "gemini-3.0-flash"
-          ];
+          const response = await fetch("https://api.deepseek.com/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: "deepseek-v4-flash-vision-exp",
+              messages: [
+                {
+                  role: "user",
+                  content: contentParts
+                }
+              ],
+              max_tokens: 4096,
+              temperature: 0.7,
+              stream: false
+            })
+          });
 
-          let responseData = null;
-          let lastError = null;
+          const data = await response.json();
 
-          for (const model of candidateModels) {
-            try {
-              statusDiv.style.color = "#38bdf8";
-              statusDiv.innerText = `⏳ Trying model: ${model}...`;
-
-              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  contents: [{
-                    parts: [...imageParts, { text: promptText }]
-                  }]
-                })
-              });
-
-              const data = await res.json();
-              if (data.candidates && data.candidates[0]) {
-                responseData = data;
-                statusDiv.innerText = `✅ Model ${model} responded.`;
-                break;
-              } else if (data.error) {
-                lastError = data.error.message;
-                console.warn(`Model ${model} failed:`, data.error.message);
-              }
-            } catch (err) {
-              lastError = err.message;
-              console.warn(`Model ${model} threw:`, err.message);
-            }
+          if (data.error) {
+            throw new Error(data.error.message || JSON.stringify(data.error));
           }
 
-          if (!responseData) {
-            throw new Error(lastError || "None of the specified models responded. Please check your API Key.");
+          if (!data.choices || !data.choices[0]) {
+            throw new Error("No response from DeepSeek. Check your API key and model name.");
           }
 
-          const rawText = responseData.candidates[0].content.parts[0].text;
+          const rawText = data.choices[0].message.content;
           const cleanJson = rawText.replace(/```json|```/g, '').trim();
           const article = JSON.parse(cleanJson);
 
+          // ملء النموذج بالبيانات المُولَّدة
           document.getElementById('title').value = article.title || '';
           document.getElementById('excerpt').value = article.excerpt || '';
           document.getElementById('content').value = article.content || '';
@@ -386,6 +380,7 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
             catSelect.value = "Technology";
           }
 
+          // تشغيل حدث input لتوليد الـ slug تلقائيًا
           document.getElementById('title').dispatchEvent(new Event('input'));
 
           statusDiv.style.color = "#4ade80";
