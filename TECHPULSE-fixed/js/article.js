@@ -215,10 +215,12 @@
         document.head.appendChild(script);
     }
 
-   /* ---------- Reading Progress + Scroll Top ---------- */
-(function readingProgress() {
-    const bar = $('#readingProgressBar');
-    const top = $('#scrollTopBtn');
+    /* ---------- Reading Progress + Scroll Top ----------
+       #readingProgressBar is the same element/ID used on index.html
+       (and every other page) — keep them in sync if you ever rename it. */
+    (function readingProgress() {
+        const bar = $('#readingProgressBar');
+        const top = $('#scrollTopBtn');
         function onScroll() {
             if (bar) {
                 const h = document.documentElement;
