@@ -215,10 +215,10 @@
         document.head.appendChild(script);
     }
 
-    /* ---------- Reading Progress + Scroll Top ---------- */
-    (function readingProgress() {
-        const bar = $('#readingProgress');
-        const top = $('#scrollTopBtn');
+   /* ---------- Reading Progress + Scroll Top ---------- */
+(function readingProgress() {
+    const bar = $('#readingProgressBar');
+    const top = $('#scrollTopBtn');
         function onScroll() {
             if (bar) {
                 const h = document.documentElement;
