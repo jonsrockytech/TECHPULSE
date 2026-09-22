@@ -6,7 +6,7 @@
   <title>TechPulse | Article Manager</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="css/style.css?v=20260922_v5">
+  <link rel="stylesheet" href="css/style.css?v=20260922_v6">
   <style>
     .ai-generator-card {
       background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -253,10 +253,10 @@
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="js/common.js?v=20260922_v5"></script>
-  <script src="js/admin.js?v=20260922_v5"></script>
+  <script src="js/common.js?v=20260922_v6"></script>
+  <script src="js/admin.js?v=20260922_v6"></script>
 
-  <!-- AI Generator Script -->
+  <!-- Script for AI Generation (Latest Models) -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const apiKeyInput = document.getElementById("ai-api-key");
@@ -315,11 +315,11 @@ Return ONLY a raw JSON object matching this structure (no markdown fences, no \`
 }
 Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "Programming". Choose the best fit based on images.`;
 
-          // نماذج مستقرة وسريعة مع إمكانية التبديل التلقائي لضمان نجاح الطلب
           const candidateModels = [
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
-            "gemini-2.0-flash-exp"
+            "gemini-5.0-flash",
+            "gemini-4.5-flash",
+            "gemini-4.0-flash",
+            "gemini-3.6-flash"
           ];
 
           let responseData = null;
@@ -328,7 +328,7 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
           for (const model of candidateModels) {
             try {
               statusDiv.style.color = "#38bdf8";
-              statusDiv.innerText = `⏳ Connecting to ${model}...`;
+              statusDiv.innerText = `⏳ Trying model: ${model}...`;
 
               const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
                 method: 'POST',
@@ -353,7 +353,7 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
           }
 
           if (!responseData) {
-            throw new Error(lastError || "All models are currently busy. Please try again.");
+            throw new Error(lastError || "None of the specified models responded. Please check your API Key.");
           }
 
           const rawText = responseData.candidates[0].content.parts[0].text;
