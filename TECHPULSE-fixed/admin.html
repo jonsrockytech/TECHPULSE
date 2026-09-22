@@ -1,262 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TechPulse | Article Manager</title>
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="css/style.css?v=20260920c">
-  <style>
-    .ai-generator-card {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      color: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      border: 1px solid #334155;
-    }
-    .ai-generator-card h3 {
-      margin-top: 0;
-      color: #38bdf8;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .ai-input-group {
-      margin-bottom: 12px;
-    }
-    .ai-input-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
-      color: #cbd5e1;
-    }
-    .ai-input-group input[type="text"],
-    .ai-input-group input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #fff;
-      box-sizing: border-box;
-    }
-    .btn-ai {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-ai:hover {
-      background: linear-gradient(135deg, #0369a1, #1d4ed8);
-    }
-    .btn-ai:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    #ai-status {
-      margin-top: 10px;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-  </style>
-
-  <script>
-    /* SHA-256 password gate. Default password: admin123 */
-    const ADMIN_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
-    (async function () {
-      if (sessionStorage.getItem('tp_admin_token') === 'active_session') return;
-      const pass = prompt('Enter Administration Password:');
-      if (!pass) { window.location.replace('index.html'); return; }
-      try {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass));
-        const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-        if (hash === ADMIN_HASH) {
-          sessionStorage.setItem('tp_admin_token', 'active_session');
-        } else {
-          alert('Incorrect Password!');
-          window.location.replace('index.html');
-        }
-      } catch (err) {
-        alert('Secure context required. Serve the site over http(s), not file://');
-        window.location.replace('index.html');
-      }
-    })();
-  </script>
-</head>
-<body>
-
-  <div class="ticker" aria-label="Admin notice">
-    <span class="ticker-label">Admin</span>
-    <div class="ticker-track" aria-hidden="true">
-      <span class="ticker-item"><a href="index.html">Changes are saved locally in your browser — export ZIP to publish</a></span>
-      <span class="ticker-item"><a href="index.html">Changes are saved locally in your browser — export ZIP to publish</a></span>
-    </div>
-  </div>
-
-  <header class="main-header">
-    <div class="container">
-      <div class="logo">
-        <a href="index.html" aria-label="TechPulse Home">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          <span>TechPulse CMS</span>
-        </a>
-      </div>
-      <nav class="nav-links">
-        <a href="index.html">← View Site</a>
-        <button type="button" id="import-btn" class="btn-secondary" style="padding:8px 14px">⬆ Import JSON</button>
-        <button type="button" id="export-btn" class="btn-primary" style="padding:8px 14px">⬇ Export ZIP</button>
-        <input type="file" id="import-input" accept=".json" hidden>
-        <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <div id="adminStats" class="admin-stats" style="margin-top:24px"></div>
-
-    <!-- AI Auto Generator Card -->
-    <section class="ai-generator-card">
-      <h3>✨ AI Auto-Article Generator from Images</h3>
-      <p style="font-size:0.88rem; color:#94a3b8; margin-bottom:16px;">
-        Upload 3 or more images. Gemini AI will analyze them and generate a complete English technical article, title, summary, and tags into the form below.
-      </p>
-      
-      <div class="ai-input-group">
-        <label for="ai-api-key">Gemini API Key (Required):</label>
-        <input type="text" id="ai-api-key" placeholder="AIzaSy..." />
-      </div>
-
-      <div class="ai-input-group">
-        <label for="ai-images-input">Select 3 or more images:</label>
-        <input type="file" id="ai-images-input" accept="image/*" multiple />
-      </div>
-
-      <button type="button" id="ai-generate-btn" class="btn-ai">
-        <span>⚡ Analyze Images &amp; Fill Form</span>
-      </button>
-
-      <div id="ai-status"></div>
-    </section>
-
-    <div class="admin-container">
-      <section class="admin-form-card">
-        <h3 id="form-title">Add New Article</h3>
-        <form id="article-form" novalidate>
-          <input type="hidden" id="article-id">
-
-          <div class="form-group">
-            <label for="title">Title *</label>
-            <input type="text" id="title" required maxlength="140" placeholder="Article title">
-          </div>
-
-          <div class="form-group">
-            <label for="slug">Slug</label>
-            <input type="text" id="slug" maxlength="140" placeholder="auto-generated">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="category">Category *</label>
-              <select id="category" required>
-                <option value="">— Select —</option>
-                <option>Technology</option>
-                <option>Petroleum</option>
-                <option>Gas</option>
-                <option>Programming</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="author">Author</label>
-              <input type="text" id="author" maxlength="60" placeholder="TechPulse Team">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="date">Date *</label>
-              <input type="date" id="date" required>
-            </div>
-            <div class="form-group">
-              <label for="readTime">Read Time</label>
-              <input type="text" id="readTime" maxlength="20" placeholder="5 min">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="excerpt">Excerpt *</label>
-            <textarea id="excerpt" rows="2" required maxlength="300" placeholder="Short summary"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="tags">Tags (comma-separated)</label>
-            <input type="text" id="tags" maxlength="200" placeholder="esp32, iot, firmware">
-          </div>
-
-          <div class="form-group">
-            <label>Featured Image (hero)</label>
-            <div class="image-uploader">
-              <div id="image-preview" class="image-preview">
-                <span class="image-hint">Click to upload an image (max 2 MB)</span>
-              </div>
-              <input type="file" id="image-file" accept="image/*" hidden>
-              <button type="button" id="remove-image" class="btn-secondary" style="display:none;align-self:flex-start;padding:6px 12px;font-size:0.82rem">Remove image</button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Gallery Images (optional, shown below the article body)</label>
-            <div id="gallery-strip" class="gallery-strip"></div>
-            <input type="file" id="gallery-file" accept="image/*" hidden multiple>
-            <button type="button" id="add-gallery-btn" class="btn-secondary" style="align-self:flex-start;padding:6px 12px;font-size:0.82rem">+ Add gallery image(s)</button>
-          </div>
-
-          <div class="form-group">
-            <label for="content">Content * (double newline = new paragraph)</label>
-            <textarea id="content" rows="10" required placeholder="Write the full content here..."></textarea>
-          </div>
-
-          <div class="form-group" style="flex-direction:row;align-items:center;gap:10px">
-            <input type="checkbox" id="featured" style="width:auto">
-            <label for="featured" style="margin:0;font-weight:500">Featured article</label>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">Save Article</button>
-            <button type="button" id="reset-btn" class="btn-secondary" style="display:none">Cancel Editing</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="admin-list-card">
-        <h3>Published Articles</h3>
-        <div id="admin-articles-list"></div>
-      </section>
-    </div>
-  </main>
-
-  <footer class="main-footer">
-    <div class="container">
-      <p>&copy; 2026 TechPulse CMS. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="js/common.js?v=20260922_v3"></script>
-  <script src="js/admin.js?v=20260922_v3"></script>
-
-  <!-- Script for AI Generation -->
+<!-- Script for AI Generation -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const apiKeyInput = document.getElementById("ai-api-key");
@@ -264,7 +6,6 @@
       const generateBtn = document.getElementById("ai-generate-btn");
       const statusDiv = document.getElementById("ai-status");
 
-      // Load saved API Key from localStorage
       const savedKey = localStorage.getItem("tp_gemini_key");
       if (savedKey) apiKeyInput.value = savedKey;
 
@@ -299,7 +40,7 @@
         localStorage.setItem("tp_gemini_key", apiKey);
         generateBtn.disabled = true;
         statusDiv.style.color = "#38bdf8";
-        statusDiv.innerText = "⏳ Processing images and generating article...";
+        statusDiv.innerText = "⏳ Connecting to Gemini 2.5 Flash...";
 
         try {
           const imageParts = await Promise.all(files.map(f => fileToBase64(f)));
@@ -318,44 +59,28 @@ Return ONLY a raw JSON object matching this structure (no markdown fences, no \`
 }
 Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "Programming". Choose the best fit based on images.`;
 
-          const candidateModels = [
-            "gemini-2.5-flash",
-            "gemini-2.0-flash"
-          ];
+          // استخدام الموديل gemini-2.5-flash مباشرة
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [...imageParts, { text: promptText }]
+              }]
+            })
+          });
 
-          let responseData = null;
-          let lastError = null;
+          const data = await res.json();
 
-          for (const model of candidateModels) {
-            try {
-              statusDiv.innerText = `⏳ Trying model ${model}...`;
-              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  contents: [{
-                    parts: [...imageParts, { text: promptText }]
-                  }]
-                })
-              });
-
-              const data = await res.json();
-              if (data.candidates && data.candidates[0]) {
-                responseData = data;
-                break;
-              } else if (data.error) {
-                lastError = data.error.message;
-              }
-            } catch (err) {
-              lastError = err.message;
-            }
+          if (data.error) {
+            throw new Error(data.error.message || "API Error");
           }
 
-          if (!responseData) {
-            throw new Error(lastError || "Failed to generate content. Please check API Key.");
+          if (!data.candidates || !data.candidates[0]) {
+            throw new Error("No response generated from the model.");
           }
 
-          const rawText = responseData.candidates[0].content.parts[0].text;
+          const rawText = data.candidates[0].content.parts[0].text;
           const cleanJson = rawText.replace(/```json|```/g, '').trim();
           const article = JSON.parse(cleanJson);
 
@@ -393,5 +118,3 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
       });
     });
   </script>
-</body>
-</html>
