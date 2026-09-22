@@ -380,4 +380,23 @@
     /* ---------- Init ---------- */
     dateInput.value = new Date().toISOString().slice(0, 10);
     loadArticles().then(renderAdminList);
+       /* ---------- Public API for AI Generator ---------- */
+    window.TPAdmin = {
+        setFeaturedImage: function (dataUrl) {
+            currentImageData = dataUrl || '';
+            if (currentImageData) {
+                imagePreview.innerHTML = `<img src="${currentImageData}" alt="Preview">`;
+                if (removeImageBtn) removeImageBtn.style.display = 'inline-block';
+            } else {
+                imagePreview.innerHTML = '<span class="image-hint">Click to upload an image (max 2 MB)</span>';
+                if (removeImageBtn) removeImageBtn.style.display = 'none';
+            }
+        },
+        setGalleryImages: function (dataUrls) {
+            currentGalleryImages = Array.isArray(dataUrls) ? dataUrls.slice() : [];
+            renderGalleryStrip();
+        },
+        getFeaturedImage: function () { return currentImageData; },
+        getGalleryImages: function () { return currentGalleryImages.slice(); }
+    };
 })();
