@@ -1,10 +1,10 @@
 /* ============================================
-   TechPulse — Admin Controller (Supabase Integrated)
+   TechPulse — Admin Controller (Supabase Only Integrated)
    ============================================ */
 (function () {
     'use strict';
 
-    const $  = (s, c = document) => c.querySelector(s);          const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+    const $= (s, c = document) => c.querySelector(s);     const$$ = (s, c = document) => Array.from(c.querySelectorAll(s));
     
     // إعدادات اتصال Supabase
     const SUPABASE_URL = 'https://ijgvrjkpiofamwcmkmgi.supabase.co';
@@ -13,6 +13,7 @@
 
     let articlesCache = [];
 
+    // جلب المقالات مباشرة من Supabase فقط
     async function loadArticles() {
         const { data, error } = await supabaseClient
             .from('articles')
@@ -20,7 +21,7 @@
             .order('id', { ascending: false });
             
         if (error) {
-            console.error('Error loading articles:', error);
+            console.error('Error loading articles from Supabase:', error);
             toast('❌ Failed to load articles from database');
             articlesCache = [];
         } else {
@@ -164,7 +165,7 @@
         }
 
         if (!articles.length) {
-            listContainer.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px">No articles yet.</p>';
+            listContainer.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px">No articles yet in database.</p>';
             return;
         }
 
@@ -187,11 +188,11 @@
         `; }).join('');
     }
 
-    /* ---------- Form submit (Direct Supabase Upsert) ---------- */
+    /* ---------- Form submit (Supabase Only) ---------- */
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const id = articleIdInput.value ? Number(articleIdInput.value) : Date.now();
+        const id = articleIdInput.value ? Number(articleIdInput.value) : undefined;
         const title = titleInput.value.trim();
         const excerpt = excerptInput.value.trim();
         const content = contentInput.value.trim();
@@ -209,15 +210,7 @@
         }
 
         const data = {
-            id,
-            title,
-            excerpt,
-            content,
-            category,
-            author,
-            date,
-            readtime: readTime, // اسم العمود المطابق في قاعدة البيانات
-            tags,
+            title, excerpt, content, category, author, date, readTime, tags,
             featured,
             image: currentImageData || '',
             images: currentGalleryImages.slice(),
@@ -226,19 +219,29 @@
         };
 
         try {
-            const { error } = await supabaseClient
-                .from('articles')
-                .upsert([data], { onConflict: 'id' });
+            if (id) {
+                // تحديث المقال مباشرة في Supabase
+                const { error } = await supabaseClient
+                    .from('articles')
+                    .update(data)
+                    .eq('id', id);
+                if (error) throw error;
+                toast('✓ Article updated in Supabase database');
+            } else {
+                // إضافة مقال جديد مباشرة إلى Supabase
+                const { error } = await supabaseClient
+                    .from('articles')
+                    .insert([data]);
+                if (error) throw error;
+                toast('✓ Article created in Supabase database');
+            }
 
-            if (error) throw error;
-
-            toast('✓ Article saved successfully to Supabase!');
             resetForm();
             await loadArticles();
             renderAdminList();
         } catch (err) {
-            console.error('Error saving to Supabase:', err);
-            toast('❌ Database Error: ' + err.message);
+            console.error('Error saving article to Supabase:', err);
+            toast('❌ Error saving to Supabase: ' + err.message);
         }
     });
 
@@ -269,7 +272,7 @@
         categoryInput.value = art.category || '';
         authorInput.value = art.author || '';
         dateInput.value = art.date || '';
-        readTimeInput.value = art.readtime || art.readTime || '';
+        readTimeInput.value = art.readTime || '';
         tagsInput.value = Array.isArray(art.tags) ? art.tags.join(', ') : (art.tags || '');
         featuredInput.checked = !!art.featured;
 
@@ -291,7 +294,7 @@
     }
 
     async function deleteArticle(id) {
-        if (!confirm('Are you sure you want to delete this article?')) return;
+        if (!confirm('Are you sure you want to delete this article from Supabase?')) return;
         try {
             const { error } = await supabaseClient
                 .from('articles')
@@ -301,10 +304,10 @@
 
             await loadArticles();
             renderAdminList();
-            toast('🗑 Article deleted from database');
+            toast('🗑 Article deleted from Supabase database');
         } catch (err) {
-            console.error('Error deleting article:', err);
-            toast('❌ Error deleting article');
+            console.error('Error deleting article from Supabase:', err);
+            toast('❌ Error deleting article from database');
         }
     }
 
