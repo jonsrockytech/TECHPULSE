@@ -4,7 +4,7 @@
 (function () {
     'use strict';
 
-    const $  = (s, c = document) => c.querySelector(s);     const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+    const $  = (s, c = document) => c.querySelector(s);          const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
     
     // إعدادات اتصال Supabase
     const SUPABASE_URL = 'https://ijgvrjkpiofamwcmkmgi.supabase.co';
@@ -30,10 +30,6 @@
     }
 
     function getArticles() { return articlesCache; }
-
-    async function saveArticlesToDb(list) {
-        articlesCache = list;
-    }
 
     function toast(msg) { window.showToast && window.showToast(msg); }
 
@@ -191,11 +187,11 @@
         `; }).join('');
     }
 
-    /* ---------- Form submit ---------- */
+    /* ---------- Form submit (Direct Supabase Upsert) ---------- */
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const id = articleIdInput.value ? Number(articleIdInput.value) : undefined;
+        const id = articleIdInput.value ? Number(articleIdInput.value) : Date.now();
         const title = titleInput.value.trim();
         const excerpt = excerptInput.value.trim();
         const content = contentInput.value.trim();
@@ -213,7 +209,15 @@
         }
 
         const data = {
-            title, excerpt, content, category, author, date, readTime, tags,
+            id,
+            title,
+            excerpt,
+            content,
+            category,
+            author,
+            date,
+            readtime: readTime, // اسم العمود المطابق في قاعدة البيانات
+            tags,
             featured,
             image: currentImageData || '',
             images: currentGalleryImages.slice(),
@@ -222,29 +226,19 @@
         };
 
         try {
-            if (id) {
-                // تحديث مقال موجود
-                const { error } = await supabaseClient
-                    .from('articles')
-                    .update(data)
-                    .eq('id', id);
-                if (error) throw error;
-                toast('✓ Article updated in database');
-            } else {
-                // إضافة مقال جديد
-                const { error } = await supabaseClient
-                    .from('articles')
-                    .insert([data]);
-                if (error) throw error;
-                toast('✓ Article created in database');
-            }
+            const { error } = await supabaseClient
+                .from('articles')
+                .upsert([data], { onConflict: 'id' });
 
+            if (error) throw error;
+
+            toast('✓ Article saved successfully to Supabase!');
             resetForm();
             await loadArticles();
             renderAdminList();
         } catch (err) {
-            console.error('Error saving article:', err);
-            toast('❌ Error saving to database: ' + err.message);
+            console.error('Error saving to Supabase:', err);
+            toast('❌ Database Error: ' + err.message);
         }
     });
 
@@ -275,7 +269,7 @@
         categoryInput.value = art.category || '';
         authorInput.value = art.author || '';
         dateInput.value = art.date || '';
-        readTimeInput.value = art.readTime || '';
+        readTimeInput.value = art.readtime || art.readTime || '';
         tagsInput.value = Array.isArray(art.tags) ? art.tags.join(', ') : (art.tags || '');
         featuredInput.checked = !!art.featured;
 
