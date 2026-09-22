@@ -6,7 +6,7 @@
   <title>TechPulse | Article Manager</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="css/style.css?v=20260922_v6">
+  <link rel="stylesheet" href="css/style.css?v=20260922_v7">
   
   <!-- مكتبة Supabase للاتصال بقاعدة البيانات -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -119,7 +119,7 @@
       </div>
       <nav class="nav-links">
         <a href="index.html">← View Site</a>
-        <button type="button" id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
+        <button id="darkModeToggle" type="button" aria-pressed="false" aria-label="Switch theme">🌙</button>
       </nav>
     </div>
   </header>
@@ -253,56 +253,9 @@
     </div>
   </footer>
 
-  <script src="js/common.js?v=20260922_v6"></script>
-
-  <!-- ربط قاعدة البيانات Supabase ومعالجة النموذج -->
-  <script>
-    const SUPABASE_URL = 'https://ijgvrjkpiofamwcmkmgi.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_5NcPMPDtyNXRg-oduydRUA_JM6IeV9k';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const form = document.getElementById("article-form");
-
-      form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const title = document.getElementById("title").value.trim();
-        const category = document.getElementById("category").value;
-        const excerpt = document.getElementById("excerpt").value.trim();
-        const content = document.getElementById("content").value.trim();
-
-        if (!title || !category || !excerpt || !content) {
-          alert("Please fill in all required fields (*)");
-          return;
-        }
-
-        const articleData = {
-          title: title,
-          category: category,
-          excerpt: excerpt,
-          content: content
-        };
-
-        try {
-          const { data, error } = await supabaseClient
-            .from('articles')
-            .insert([articleData]);
-
-          if (error) {
-            throw error;
-          }
-
-          alert("✅ Article saved successfully to Supabase and synced across devices!");
-          form.reset();
-          location.reload();
-        } catch (err) {
-          console.error("Error saving article:", err);
-          alert("❌ Error saving article: " + err.message);
-        }
-      });
-    });
-  </script>
+  <script src="js/common.js?v=20260922_v7"></script>
+  <!-- ربط ملف التحكم الأساسي الذي يدير عمليات Supabase -->
+  <script src="js/admin.js?v=20260922_v7"></script>
 
   <!-- Script for AI Generation — Groq Vision (Qwen) -->
   <script>
