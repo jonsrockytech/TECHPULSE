@@ -64,24 +64,33 @@ window.TPCommon = (function () {
     if (cache && !force) return cache;
     let published = [];
 
-    // 1. محاولة الجلب مباشرة من Supabase API
+let cache = null;
+  async function getArticles(force) {
+    if (cache && !force) return cache;
+    
+    // جلب المقالات من Supabase حصراً
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=*&order=date.desc`, {
+      const res = await fetch('https://ijgvrjkpiofamwcmkmgi.supabase.co/rest/v1/articles?select=*&order=date.desc', {
         headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          'apikey': 'YOUR_ANON_KEY',          // ضع مفتاح ال-anon الخاص بك هنا من لوحة تحكم Supabase
+          'Authorization': 'Bearer YOUR_ANON_KEY' // ضع نفس المفتاح هنا أيضاً
         }
       });
       if (res.ok) {
         const json = await res.json();
-        if (Array.isArray(json) && json.length > 0) {
+        if (Array.isArray(json)) {
           cache = json;
           return json;
         }
       }
     } catch (err) {
-      console.warn('Could not load from Supabase, falling back to local/static data', err);
+      console.warn('Could not load from Supabase', err);
     }
+
+    // إذا حدث أي خطأ أو لم تقم بإدخال المفتاح الصحيح، ستظهر قائمة فارغة ولن يتم إرجاع المقالات المحلية القديمة
+    cache = [];
+    return [];
+  }
 
     // 2. البديل الاحتياطي (الملف الثابت) في حال عدم توفر اتصال
     try {
