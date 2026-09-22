@@ -126,20 +126,20 @@
   <main class="container">
     <div id="adminStats" class="admin-stats" style="margin-top:24px"></div>
 
-    <!-- AI Auto Generator Card — DeepSeek -->
+    <!-- AI Auto Generator Card — Groq -->
     <section class="ai-generator-card">
-      <h3>✨ AI Auto-Article Generator from Images (DeepSeek)</h3>
+      <h3>✨ AI Auto-Article Generator from Images (Groq)</h3>
       <p style="font-size:0.88rem; color:#94a3b8; margin-bottom:16px;">
-        Upload 3 or more images. DeepSeek AI will analyze them and generate a complete English technical article, title, summary, and tags into the form below.
+        Upload up to 3 images. Groq's Qwen vision model will analyze them and generate a complete English technical article, title, summary, and tags into the form below.
       </p>
       
       <div class="ai-input-group">
-        <label for="ai-api-key">DeepSeek API Key (Required):</label>
-        <input type="text" id="ai-api-key" placeholder="sk-..." />
+        <label for="ai-api-key">Groq API Key (Required):</label>
+        <input type="text" id="ai-api-key" placeholder="gsk_..." />
       </div>
 
       <div class="ai-input-group">
-        <label for="ai-images-input">Select 3 or more images:</label>
+        <label for="ai-images-input">Select 3 images (max 3 for Groq):</label>
         <input type="file" id="ai-images-input" accept="image/*" multiple />
       </div>
 
@@ -256,7 +256,7 @@
   <script src="js/common.js?v=20260922_v6"></script>
   <script src="js/admin.js?v=20260922_v6"></script>
 
-  <!-- Script for AI Generation — DeepSeek Vision -->
+  <!-- Script for AI Generation — Groq Vision (Qwen) -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const apiKeyInput = document.getElementById("ai-api-key");
@@ -264,12 +264,12 @@
       const generateBtn = document.getElementById("ai-generate-btn");
       const statusDiv = document.getElementById("ai-status");
 
-      const savedKey = localStorage.getItem("tp_deepseek_key");
+      const savedKey = localStorage.getItem("tp_groq_key");
       if (savedKey) apiKeyInput.value = savedKey;
 
       /**
-       * يحوّل ملف الصورة إلى data URL بصيغة base64
-       * DeepSeek يستخدم نفس تنسيق OpenAI: { type: "image_url", image_url: { url: "data:image/..." } }
+       * يحوّل ملف الصورة إلى data URL بصيغة base64.
+       * Groq يستخدم نفس تنسيق OpenAI: { type: "image_url", image_url: { url: "data:image/..." } }
        */
       function fileToDataUrl(file) {
         return new Promise((resolve, reject) => {
@@ -285,16 +285,21 @@
         const files = Array.from(imagesInput.files);
 
         if (!apiKey) {
-          alert("Please enter your DeepSeek API Key.");
+          alert("Please enter your Groq API Key.");
           return;
         }
 
-        if (files.length < 3) {
-          alert("Please select at least 3 images.");
+        if (files.length < 1) {
+          alert("Please select at least 1 image.");
           return;
         }
 
-        localStorage.setItem("tp_deepseek_key", apiKey);
+        if (files.length > 3) {
+          alert("Groq currently supports a maximum of 3 images per request. Please select 3 or fewer.");
+          return;
+        }
+
+        localStorage.setItem("tp_groq_key", apiKey);
         generateBtn.disabled = true;
 
         try {
@@ -323,18 +328,18 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
           contentParts.push({ type: "text", text: promptText });
 
           // ============================================================
-          // DeepSeek API — متوافق مع تنسيق OpenAI
-          // النموذج: deepseek-v4-flash-vision-exp (يدعم الصور + النص)
-          // المرجع: https://api-docs.deepseek.com
+          // Groq API — متوافق مع تنسيق OpenAI
+          // النموذج: qwen/qwen3.8-27b (يدعم الصور + النص)
+          // المرجع: https://console.groq.com/docs/vision
           // ============================================================
-          const response = await fetch("https://api.deepseek.com/chat/completions", {
+          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-              model: "deepseek-v4-flash-vision-exp",
+              model: "qwen/qwen3.8-27b",
               messages: [
                 {
                   role: "user",
@@ -354,7 +359,7 @@ Allowed values for category are strictly: "Technology", "Petroleum", "Gas", or "
           }
 
           if (!data.choices || !data.choices[0]) {
-            throw new Error("No response from DeepSeek. Check your API key and model name.");
+            throw new Error("No response from Groq. Check your API key and model name.");
           }
 
           const rawText = data.choices[0].message.content;
